@@ -15,13 +15,17 @@ include_directories(include/)
 include(${QT_USE_FILE})
 
 set(SOURCES
+    src/wigra.cpp
+
     src/main.cpp
 )
 
 set(HEADERS
+    include/wigra.h
 )
 
 set(UI
+    res/ui/igra.ui
 )
 
 set(RESOURCES
