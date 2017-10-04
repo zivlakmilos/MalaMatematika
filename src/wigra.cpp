@@ -11,5 +11,6 @@ WIgra::WIgra(QWidget *parent)
 
 WIgra::~WIgra(void)
 {
-    delete ui;
+    if(ui)
+        delete ui;
 }
