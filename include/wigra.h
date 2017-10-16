@@ -16,7 +16,18 @@ public:
     virtual ~WIgra(void);
 
 private:
+    void setupHandlers(void);
+
     Ui::FrmIgra *ui;
+
+    QTimer *m_tajmer;
+
+    bool m_igraPokrenuta;
+    int m_generisano;
+
+private slots:
+    void btnStopClick(void);
+    void tajmerTimeout(void);
 };
 
 #endif // _W_IGRA_H_
