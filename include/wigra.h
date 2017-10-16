@@ -39,6 +39,7 @@ private slots:
     void tajmerTimeout(void);
     void dodajBrojUFormulu(void);
     void dodajOperacijuUFormulu(void);
+    void btnObrisiClick(void);
 };
 
 #endif // _W_IGRA_H_

@@ -29,6 +29,7 @@ void WIgra::setupHandlers(void)
             this, SLOT(btnStopClick()));
     connect(m_tajmer, SIGNAL(timeout()),
             this, SLOT(tajmerTimeout()));
+
     connect(ui->btnBroj1, SIGNAL(clicked(bool)),
             this, SLOT(dodajBrojUFormulu()));
     connect(ui->btnBroj2, SIGNAL(clicked(bool)),
@@ -53,6 +54,9 @@ void WIgra::setupHandlers(void)
             this, SLOT(dodajOperacijuUFormulu()));
     connect(ui->btnZagradaZatvorena, SIGNAL(clicked(bool)),
             this, SLOT(dodajOperacijuUFormulu()));
+
+    connect(ui->btnObrisi, SIGNAL(clicked(bool)),
+            this, SLOT(btnObrisiClick()));
 }
 
 void WIgra::prikaziFormulu(void)
@@ -241,5 +245,39 @@ void WIgra::dodajOperacijuUFormulu(void)
 
     m_formula.push_back(element);
 
+    prikaziFormulu();
+}
+
+void WIgra::btnObrisiClick(void)
+{
+    if(m_formula.isEmpty())
+        return;
+
+    ElementOperacije element = m_formula[m_formula.size() - 1];
+
+    if(element.tip == TipElementaOperacijeOperator)
+    {
+        if(element.vrednost.operacija == OperatorZagradaOtvorena)
+            m_brojZagrada--;
+        else if(element.vrednost.operacija == OperatorZagradaZatvorena)
+            m_brojZagrada++;
+    } else
+    {
+        for(int i = 1; i <= 6; i++)
+        {
+            QPushButton *btn = findChild<QPushButton*>("btnBroj" + QString::number(i));
+            if(btn)
+            {
+                if(btn->text() == QString::number(element.vrednost.operand) &&
+                    !btn->isEnabled())
+                {
+                    btn->setEnabled(true);
+                    break;
+                }
+            }
+        }
+    }
+
+    m_formula.pop_back();
     prikaziFormulu();
 }
