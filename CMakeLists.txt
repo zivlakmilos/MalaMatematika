@@ -15,6 +15,8 @@ include_directories(include/)
 include(${QT_USE_FILE})
 
 set(SOURCES
+    src/random.cpp
+
     src/wigra.cpp
 
     src/main.cpp
