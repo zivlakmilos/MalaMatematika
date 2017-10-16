@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "random.h"
+#include "matematika.h"
 
 namespace Ui {
     class FrmIgra;
@@ -19,6 +20,7 @@ public:
 
 private:
     void setupHandlers(void);
+    void prikaziFormulu(void);
 
     Ui::FrmIgra *ui;
 
@@ -27,7 +29,8 @@ private:
     bool m_igraPokrenuta;
     int m_generisano;
     bool m_generisanjeZavrseno;
-    QString m_formula;
+    QVector<ElementOperacije> m_formula;
+    int m_brojZagrada;
 
     Random m_random;
 

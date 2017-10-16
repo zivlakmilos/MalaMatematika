@@ -10,7 +10,8 @@ WIgra::WIgra(QWidget *parent)
       m_tajmer(new QTimer(this)),
       m_igraPokrenuta(false),
       m_generisano(0),
-      m_generisanjeZavrseno(false)
+      m_generisanjeZavrseno(false),
+      m_brojZagrada(0)
 {
     ui->setupUi(this);
     setupHandlers();
@@ -54,6 +55,43 @@ void WIgra::setupHandlers(void)
             this, SLOT(dodajOperacijuUFormulu()));
 }
 
+void WIgra::prikaziFormulu(void)
+{
+    QString str;
+    for(auto it = m_formula.begin(); it != m_formula.end(); it++)
+    {
+        if(it->tip == TipElementaOperacijeOperator)
+        {
+            switch(it->vrednost.operacija)
+            {
+                case OperatorPlus:
+                    str += "+";
+                    break;
+                case OperatorMinus:
+                    str += "-";
+                    break;
+                case OperatorPuta:
+                    str += "*";
+                    break;
+                case OperatorPodeljeno:
+                    str += "/";
+                    break;
+                case OperatorZagradaOtvorena:
+                    str += "(";
+                    break;
+                case OperatorZagradaZatvorena:
+                    str += ")";
+                    break;
+            }
+        } else
+        {
+            str += QString::number(it->vrednost.operand);
+        }
+    }
+
+    ui->lblFormula1->setText(str);
+}
+
 void WIgra::btnStopClick(void)
 {
     if(m_igraPokrenuta)
@@ -64,7 +102,8 @@ void WIgra::btnStopClick(void)
         m_igraPokrenuta = true;
         m_generisano = 0;
         m_generisanjeZavrseno = false;
-        m_formula = "";
+        m_brojZagrada = 0;
+        m_formula.clear();
         m_tajmer->start(100);
         ui->btnStop->setText("STOP");
     }
@@ -126,12 +165,23 @@ void WIgra::dodajBrojUFormulu(void)
 {
     if(!m_generisanjeZavrseno)
         return;
+    if(!m_formula.isEmpty())
+    {
+        if(m_formula[m_formula.size() - 1].tip == TipElementaOperacijeOperand ||
+            m_formula[m_formula.size() - 1].vrednost.operacija == OperatorZagradaZatvorena)
+            return;
+    }
 
     QPushButton *s = (QPushButton*)sender();
     QString vrednost = s->text();
-    m_formula.append(vrednost);
-    ui->lblFormula1->setText(m_formula);
+
+    ElementOperacije element;
+    element.tip = TipElementaOperacijeOperand;
+    element.vrednost.operand = vrednost.toInt();
+    m_formula.push_back(element);
     s->setDisabled(true);
+
+    prikaziFormulu();
 }
 
 void WIgra::dodajOperacijuUFormulu(void)
@@ -141,6 +191,55 @@ void WIgra::dodajOperacijuUFormulu(void)
 
     QPushButton *s = (QPushButton*)sender();
     QString vrednost = s->text();
-    m_formula.append(vrednost);
-    ui->lblFormula1->setText(m_formula);
+
+    ElementOperacije element;
+    element.tip = TipElementaOperacijeOperator;
+    switch(vrednost.at(0).toAscii())
+    {
+        case '+':
+            element.vrednost.operacija = OperatorPlus;
+            break;
+        case '-':
+            element.vrednost.operacija = OperatorMinus;
+            break;
+        case '*':
+            element.vrednost.operacija = OperatorPuta;
+            break;
+        case '/':
+            element.vrednost.operacija = OperatorPodeljeno;
+            break;
+        case '(':
+            element.vrednost.operacija = OperatorZagradaOtvorena;
+            break;
+        case ')':
+            element.vrednost.operacija = OperatorZagradaZatvorena;
+            break;
+    }
+
+    if(element.vrednost.operacija == OperatorZagradaOtvorena)
+    {
+        if(!m_formula.isEmpty())
+            if(m_formula[m_formula.size() - 1].tip == TipElementaOperacijeOperand)
+                return;
+        m_brojZagrada++;
+    } else
+    {
+        if(m_formula.empty())
+            return;
+        if(m_formula[m_formula.size() - 1].tip == TipElementaOperacijeOperator &&
+            m_formula[m_formula.size() - 1].vrednost.operand != OperatorZagradaZatvorena)
+            return;
+
+        if(element.vrednost.operacija == OperatorZagradaZatvorena)
+        {
+            if(m_brojZagrada > 0)
+                m_brojZagrada--;
+            else
+                return;
+        }
+    }
+
+    m_formula.push_back(element);
+
+    prikaziFormulu();
 }
