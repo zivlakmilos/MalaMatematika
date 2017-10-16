@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "random.h"
+
 namespace Ui {
     class FrmIgra;
 }
@@ -24,10 +26,16 @@ private:
 
     bool m_igraPokrenuta;
     int m_generisano;
+    bool m_generisanjeZavrseno;
+    QString m_formula;
+
+    Random m_random;
 
 private slots:
     void btnStopClick(void);
     void tajmerTimeout(void);
+    void dodajBrojUFormulu(void);
+    void dodajOperacijuUFormulu(void);
 };
 
 #endif // _W_IGRA_H_
