@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include <stdint.h>
+
 #include "random.h"
 #include "matematika.h"
 
@@ -26,11 +28,10 @@ private:
 
     QTimer *m_tajmer;
 
-    bool m_igraPokrenuta;
-    int m_generisano;
-    bool m_generisanjeZavrseno;
+    bool m_generisanjePokrenuto;
+    uint8_t m_generisano;
     QVector<ElementOperacije> m_formula;
-    int m_brojZagrada;
+    uint8_t m_brojZagrada;
 
     Random m_random;
 

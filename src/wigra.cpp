@@ -8,9 +8,8 @@ WIgra::WIgra(QWidget *parent)
     : QWidget(parent),
       ui(new Ui::FrmIgra()),
       m_tajmer(new QTimer(this)),
-      m_igraPokrenuta(false),
+      m_generisanjePokrenuto(false),
       m_generisano(0),
-      m_generisanjeZavrseno(false),
       m_brojZagrada(0)
 {
     ui->setupUi(this);
@@ -98,18 +97,28 @@ void WIgra::prikaziFormulu(void)
 
 void WIgra::btnStopClick(void)
 {
-    if(m_igraPokrenuta)
+    if(m_generisanjePokrenuto)
     {
         m_generisano++;
     } else
     {
-        m_igraPokrenuta = true;
+        m_generisanjePokrenuto = true;
         m_generisano = 0;
-        m_generisanjeZavrseno = false;
         m_brojZagrada = 0;
         m_formula.clear();
+
+        ui->lblTrazeniBroj1->setText("");
+        ui->lblTrazeniBroj2->setText("");
+        ui->lblTrazeniBroj3->setText("");
+        ui->btnBroj1->setText("");
+        ui->btnBroj2->setText("");
+        ui->btnBroj3->setText("");
+        ui->btnBroj4->setText("");
+        ui->btnBroj5->setText("");
+        ui->btnBroj6->setText("");
+
         m_tajmer->start(100);
-        ui->btnStop->setText("STOP");
+        ui->btnStop->setText(tr("STOP"));
     }
 }
 
@@ -160,14 +169,15 @@ void WIgra::tajmerTimeout(void)
         ui->btnBroj6->setText(QString::number(slucajanBroj));
     } else
     {
-        m_generisanjeZavrseno = true;
+        m_generisanjePokrenuto = false;
         m_tajmer->stop();
+        ui->btnStop->setText(tr("NOVA IGRA"));
     }
 }
 
 void WIgra::dodajBrojUFormulu(void)
 {
-    if(!m_generisanjeZavrseno)
+    if(m_generisanjePokrenuto)
         return;
     if(!m_formula.isEmpty())
     {
@@ -190,7 +200,7 @@ void WIgra::dodajBrojUFormulu(void)
 
 void WIgra::dodajOperacijuUFormulu(void)
 {
-    if(!m_generisanjeZavrseno)
+    if(m_generisanjePokrenuto)
         return;
 
     QPushButton *s = (QPushButton*)sender();
