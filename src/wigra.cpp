@@ -56,6 +56,8 @@ void WIgra::setupHandlers(void)
 
     connect(ui->btnObrisi, SIGNAL(clicked(bool)),
             this, SLOT(btnObrisiClick()));
+    connect(ui->btnPotvrdi, SIGNAL(clicked(bool)),
+            this, SLOT(btnPotvrdiClick()));
 }
 
 void WIgra::prikaziFormulu(void)
@@ -116,6 +118,15 @@ void WIgra::btnStopClick(void)
         ui->btnBroj4->setText("");
         ui->btnBroj5->setText("");
         ui->btnBroj6->setText("");
+
+        ui->btnBroj1->setEnabled(true);
+        ui->btnBroj2->setEnabled(true);
+        ui->btnBroj3->setEnabled(true);
+        ui->btnBroj4->setEnabled(true);
+        ui->btnBroj5->setEnabled(true);
+        ui->btnBroj6->setEnabled(true);
+
+        prikaziFormulu();
 
         m_tajmer->start(100);
         ui->btnStop->setText(tr("STOP"));
@@ -179,7 +190,7 @@ void WIgra::dodajBrojUFormulu(void)
 {
     if(m_generisanjePokrenuto)
         return;
-    if(!m_formula.isEmpty())
+    if(!m_formula.empty())
     {
         if(m_formula[m_formula.size() - 1].tip == TipElementaOperacijeOperand ||
             m_formula[m_formula.size() - 1].vrednost.operacija == OperatorZagradaZatvorena)
@@ -193,7 +204,7 @@ void WIgra::dodajBrojUFormulu(void)
     element.tip = TipElementaOperacijeOperand;
     element.vrednost.operand = vrednost.toInt();
     m_formula.push_back(element);
-    s->setDisabled(true);
+    s->setEnabled(false);
 
     prikaziFormulu();
 }
@@ -232,7 +243,7 @@ void WIgra::dodajOperacijuUFormulu(void)
 
     if(element.vrednost.operacija == OperatorZagradaOtvorena)
     {
-        if(!m_formula.isEmpty())
+        if(!m_formula.empty())
             if(m_formula[m_formula.size() - 1].tip == TipElementaOperacijeOperand)
                 return;
         m_brojZagrada++;
@@ -260,7 +271,7 @@ void WIgra::dodajOperacijuUFormulu(void)
 
 void WIgra::btnObrisiClick(void)
 {
-    if(m_formula.isEmpty())
+    if(m_formula.empty())
         return;
 
     ElementOperacije element = m_formula[m_formula.size() - 1];
@@ -290,4 +301,10 @@ void WIgra::btnObrisiClick(void)
 
     m_formula.pop_back();
     prikaziFormulu();
+}
+
+void WIgra::btnPotvrdiClick(void)
+{
+    uint32_t rezultat = m_matematika.racunajInfiksu(m_formula);
+    qDebug() << rezultat;
 }

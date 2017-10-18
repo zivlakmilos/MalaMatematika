@@ -16,6 +16,7 @@ include(${QT_USE_FILE})
 
 set(SOURCES
     src/random.cpp
+    src/matematika.cpp
 
     src/wigra.cpp
 

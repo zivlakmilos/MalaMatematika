@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+#include <vector>
 #include <stdint.h>
 
 #include "random.h"
@@ -30,10 +31,11 @@ private:
 
     bool m_generisanjePokrenuto;
     uint8_t m_generisano;
-    QVector<ElementOperacije> m_formula;
+    std::vector<ElementOperacije> m_formula;
     uint8_t m_brojZagrada;
 
     Random m_random;
+    Matematika m_matematika;
 
 private slots:
     void btnStopClick(void);
@@ -41,6 +43,7 @@ private slots:
     void dodajBrojUFormulu(void);
     void dodajOperacijuUFormulu(void);
     void btnObrisiClick(void);
+    void btnPotvrdiClick(void);
 };
 
 #endif // _W_IGRA_H_
