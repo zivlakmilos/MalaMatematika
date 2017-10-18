@@ -3,6 +3,7 @@
 #include <QtGui>
 
 #include "ui_igra.h"
+#include "exceptionzagrada.h"
 
 WIgra::WIgra(QWidget *parent)
     : QWidget(parent),
@@ -305,6 +306,11 @@ void WIgra::btnObrisiClick(void)
 
 void WIgra::btnPotvrdiClick(void)
 {
-    uint32_t rezultat = m_matematika.racunajInfiksu(m_formula);
-    qDebug() << rezultat;
+    try {
+        uint32_t rezultat = m_matematika.racunajInfiksu(m_formula);
+        qDebug() << rezultat;
+    } catch(ExceptionZagrada &ex) {
+        QMessageBox::warning(this, QCoreApplication::applicationName(),
+                             tr("Nisu zatvorene sve zagrade"));
+    }
 }

@@ -1,5 +1,7 @@
 #include "matematika.h"
 
+#include "exceptionzagrada.h"
+
 Matematika::Matematika(void)
 {
 }
@@ -31,9 +33,36 @@ uint32_t Matematika::racunajInfiksu(const std::vector<ElementOperacije> &formula
             }
         } else
         {
-            if((it->vrednost.operacija == OperatorPuta ||
-                it->vrednost.operacija == OperatorPodeljeno) &&
-                operacijaPostoji)
+            if(it->vrednost.operacija == OperatorZagradaOtvorena)
+            {
+                std::vector<ElementOperacije> formula2;
+                int zagradaIndex = it - formula.begin();
+                while(true)
+                {
+                    it++;
+                    if(it == formula.end())
+                        throw ExceptionZagrada(zagradaIndex);
+                    if(it->tip == TipElementaOperacijeOperator &&
+                       it->vrednost.operacija == OperatorZagradaZatvorena)
+                        break;
+
+                    formula2.push_back(*it);
+                }
+
+                uint32_t tmp = racunajInfiksu(formula2);
+                if(operacija2Postoji)
+                {
+                    broj2 = izvrsiOperaciju(broj2, tmp, operacija2);
+                    operacija2Postoji = false;
+                } else
+                {
+                    broj2 = tmp;
+                }
+            } else if((it->vrednost.operacija == OperatorPuta ||
+                       it->vrednost.operacija == OperatorPodeljeno) &&
+                      (operacija == OperatorPlus ||
+                       operacija == OperatorMinus) &&
+                       operacijaPostoji)
             {
                 operacija2 = it->vrednost.operacija;
                 operacija2Postoji = true;
@@ -68,7 +97,7 @@ uint32_t Matematika::izvrsiOperaciju(uint32_t operand1, uint32_t operand2, Opera
             rezultat = operand1 / operand2;
             break;
         default:
-            // TODO: Baci expcetion
+            throw Exception("Operacija nije dozvoljena");
             break;
     }
 
