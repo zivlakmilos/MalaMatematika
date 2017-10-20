@@ -12,7 +12,7 @@ Matematika::~Matematika(void)
 {
 }
 
-uint32_t Matematika::racunajInfiksu(const std::vector<ElementOperacije> &formula)
+uint32_t Matematika::racunajInfiksnu(const std::vector<ElementOperacije> &formula)
 {
     uint32_t broj1 = 0;
     uint32_t broj2 = 0;
@@ -51,7 +51,7 @@ uint32_t Matematika::racunajInfiksu(const std::vector<ElementOperacije> &formula
                     formula2.push_back(*it);
                 }
 
-                uint32_t tmp = racunajInfiksu(formula2);
+                uint32_t tmp = racunajInfiksnu(formula2);
                 if(operacija2Postoji)
                 {
                     broj2 = izvrsiOperaciju(broj2, tmp, operacija2);
@@ -79,6 +79,35 @@ uint32_t Matematika::racunajInfiksu(const std::vector<ElementOperacije> &formula
     broj1 = izvrsiOperaciju(broj1, broj2, operacija);
 
     return broj1;
+}
+
+uint32_t Matematika::racunajPostfoksnu(const std::vector<ElementOperacije> &formula)
+{
+    std::stack<uint32_t> stek;
+
+    for(auto it = formula.begin(); it != formula.end(); it++)
+    {
+        if(it->tip == TipElementaOperacijeOperator)
+        {
+            if(stek.size() < 2)
+                throw Exception("Greska prilikom racunanja infiksne notacije");
+
+            uint32_t broj2 = stek.top();
+            stek.pop();
+            uint32_t broj1 = stek.top();
+            stek.pop();
+
+            stek.push(izvrsiOperaciju(broj1, broj2, it->vrednost.operacija));
+        } else
+        {
+            stek.push(it->vrednost.operand);
+        }
+    }
+
+    if(stek.empty())
+        throw Exception("Greska prilikom racuanja infiksne notacije");
+
+    return stek.top();
 }
 
 std::vector<ElementOperacije> Matematika::pretvoriInfiksnuUPostfiksnu(const std::vector<ElementOperacije> &formula)
@@ -112,10 +141,8 @@ std::vector<ElementOperacije> Matematika::pretvoriInfiksnuUPostfiksnu(const std:
                 {
                     izlaz.push_back(stekOperatora.top());
                     stekOperatora.pop();
-                } else
-                {
-                    stekOperatora.push(*it);
                 }
+                stekOperatora.push(*it);
             }
         }
     }

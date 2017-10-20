@@ -307,8 +307,9 @@ void WIgra::btnObrisiClick(void)
 
 void WIgra::btnPotvrdiClick(void)
 {
+    return;
     try {
-        uint32_t rezultat = m_matematika.racunajInfiksu(m_formula);
+        uint32_t rezultat = m_matematika.racunajInfiksnu(m_formula);
         ui->lblRezultat1->setText(QString::number(rezultat));
     } catch(ExceptionZagrada &ex) {
         QMessageBox::warning(this, QCoreApplication::applicationName(),

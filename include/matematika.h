@@ -36,7 +36,8 @@ public:
     Matematika(void);
     ~Matematika(void);
 
-    uint32_t racunajInfiksu(const std::vector<ElementOperacije> &formula);
+    uint32_t racunajInfiksnu(const std::vector<ElementOperacije> &formula);
+    uint32_t racunajPostfoksnu(const std::vector<ElementOperacije> &formula);
 
     std::vector<ElementOperacije> pretvoriInfiksnuUPostfiksnu(const std::vector<ElementOperacije> &formula);
 
