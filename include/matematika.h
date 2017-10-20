@@ -38,6 +38,8 @@ public:
 
     uint32_t racunajInfiksu(const std::vector<ElementOperacije> &formula);
 
+    std::vector<ElementOperacije> pretvoriInfiksnuUPostfiksnu(const std::vector<ElementOperacije> &formula);
+
 private:
     uint32_t izvrsiOperaciju(uint32_t operand1, uint32_t operand2, Operator operacija);
 };

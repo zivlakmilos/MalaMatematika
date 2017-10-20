@@ -1,5 +1,7 @@
 #include "matematika.h"
 
+#include <stack>
+
 #include "exceptionzagrada.h"
 
 Matematika::Matematika(void)
@@ -77,6 +79,54 @@ uint32_t Matematika::racunajInfiksu(const std::vector<ElementOperacije> &formula
     broj1 = izvrsiOperaciju(broj1, broj2, operacija);
 
     return broj1;
+}
+
+std::vector<ElementOperacije> Matematika::pretvoriInfiksnuUPostfiksnu(const std::vector<ElementOperacije> &formula)
+{
+    std::stack<ElementOperacije> stekOperatora;
+    std::vector<ElementOperacije> izlaz;
+
+    for(auto it = formula.begin(); it != formula.end(); it++)
+    {
+        if(it->tip == TipElementaOperacijeOperand)
+        {
+            izlaz.push_back(*it);
+        } else
+        {
+            if(it->vrednost.operacija == OperatorZagradaOtvorena)
+            {
+                stekOperatora.push(*it);
+            } else if(it->vrednost.operacija == OperatorZagradaZatvorena)
+            {
+                while(stekOperatora.top().vrednost.operacija != OperatorZagradaOtvorena)
+                {
+                    izlaz.push_back(stekOperatora.top());
+                    stekOperatora.pop();
+                }
+                stekOperatora.pop();
+            } else
+            {
+                if(!stekOperatora.empty() &&
+                   it->vrednost.operacija <= stekOperatora.top().vrednost.operacija &&
+                   stekOperatora.top().vrednost.operacija < OperatorZagradaOtvorena)
+                {
+                    izlaz.push_back(stekOperatora.top());
+                    stekOperatora.pop();
+                } else
+                {
+                    stekOperatora.push(*it);
+                }
+            }
+        }
+    }
+
+    while(!stekOperatora.empty())
+    {
+        izlaz.push_back(stekOperatora.top());
+        stekOperatora.pop();
+    }
+
+    return izlaz;
 }
 
 uint32_t Matematika::izvrsiOperaciju(uint32_t operand1, uint32_t operand2, Operator operacija)

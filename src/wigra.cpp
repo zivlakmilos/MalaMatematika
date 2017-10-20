@@ -127,6 +127,7 @@ void WIgra::btnStopClick(void)
         ui->btnBroj5->setEnabled(true);
         ui->btnBroj6->setEnabled(true);
 
+        ui->lblRezultat1->setText("");
         prikaziFormulu();
 
         m_tajmer->start(100);
@@ -308,7 +309,7 @@ void WIgra::btnPotvrdiClick(void)
 {
     try {
         uint32_t rezultat = m_matematika.racunajInfiksu(m_formula);
-        qDebug() << rezultat;
+        ui->lblRezultat1->setText(QString::number(rezultat));
     } catch(ExceptionZagrada &ex) {
         QMessageBox::warning(this, QCoreApplication::applicationName(),
                              tr("Nisu zatvorene sve zagrade"));
