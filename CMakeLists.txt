@@ -19,6 +19,8 @@ set(SOURCES
     src/exceptionzagrada.cpp
     src/random.cpp
     src/matematika.cpp
+    src/dna.cpp
+    src/ai.cpp
 
     src/wigra.cpp
 

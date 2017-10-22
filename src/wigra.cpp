@@ -4,6 +4,7 @@
 
 #include "ui_igra.h"
 #include "exceptionzagrada.h"
+#include "ai.h"
 
 WIgra::WIgra(QWidget *parent)
     : QWidget(parent),
