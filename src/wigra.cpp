@@ -308,6 +308,12 @@ void WIgra::btnObrisiClick(void)
 
 void WIgra::btnPotvrdiClick(void)
 {
+    std::vector<uint32_t> tmp;
+    AI ai(100, tmp);
+    m_formula = ai.nadjiResenje();
+    prikaziFormulu();
+    return;
+
     try {
         uint32_t rezultat = m_matematika.racunajInfiksnu(m_formula);
         ui->lblRezultat1->setText(QString::number(rezultat));

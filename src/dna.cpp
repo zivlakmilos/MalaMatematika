@@ -77,4 +77,30 @@ DNA DNA::reprodukcija(const DNA &dna)
 
 void DNA::mutacija(float koeficientMutacije)
 {
+    Random random;
+    std::vector<uint8_t> operandi;
+    for(int i = 0; i < 6; i++)
+        operandi.push_back(i);
+    for(auto it = m_dna.begin(); it != m_dna.end(); it++)
+        if(it->tip == TipElementaOperacijeOperand)
+            operandi.erase(operandi.begin() + it->vrednost.operand);
+
+    for(auto it = m_dna.begin(); it != m_dna.end(); it++)
+    {
+        if(random.nextFloat() <= koeficientMutacije)
+        {
+            if(it->tip == TipElementaOperacijeOperator)
+            {
+                it->vrednost.operacija = static_cast<Operator>(random.nextInt(OperatorZagradaOtvorena));
+            } else
+            {
+                if(!operandi.empty())
+                {
+                    uint8_t index = random.nextInt(operandi.size());
+                    it->vrednost.operand = operandi[index];
+                    operandi.erase(operandi.begin() + index);
+                }
+            }
+        }
+    }
 }
