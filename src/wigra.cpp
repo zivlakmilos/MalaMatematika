@@ -309,6 +309,8 @@ void WIgra::btnObrisiClick(void)
 void WIgra::btnPotvrdiClick(void)
 {
     std::vector<uint32_t> tmp;
+    for(int i = 0; i < 6; i++)
+        tmp.push_back(i + 1);
     AI ai(100, tmp);
     m_formula = ai.nadjiResenje();
     prikaziFormulu();

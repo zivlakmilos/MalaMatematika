@@ -3,6 +3,8 @@
 
 #include "matematika.h"
 
+class AI;
+
 class DNA
 {
 public:
@@ -10,11 +12,11 @@ public:
     DNA(void);
     ~DNA(void);
 
-    inline std::vector<ElementOperacije> getDna(void) { return m_dna; }
+    inline std::vector<ElementOperacije> getDna(void) const { return m_dna; }
 
     static DNA generisiSlucajnuFormulu(uint8_t brojOperanada);
 
-    float kvalitet(void);
+    float kvalitet(uint32_t rezultat, const std::vector<uint32_t> &ponudjeniBrojevi);
     DNA reprodukcija(const DNA &dna);
     void mutacija(float koeficientMutacije);
 

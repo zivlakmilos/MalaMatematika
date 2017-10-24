@@ -3,6 +3,7 @@
 
 #include "dna.h"
 #include "matematika.h"
+#include "random.h"
 
 #define AI_PODRAZUMEVANA_KONSTANTA_MUTACIJE         0.01f
 #define AI_PODRAZUMEVANA_VELICINA_POPULACIJE        1000
@@ -19,10 +20,14 @@ public:
     inline uint32_t getVelicinaPopulacije(void) { return m_velicinaPopulacije; }
     inline void setVelicinaPopulacije(uint32_t velicinaPopulacije) { m_velicinaPopulacije = velicinaPopulacije; }
 
+    inline std::vector<uint32_t> getPonudjeniBrojevi(void) { return m_ponudjeniBrojevi; }
+
     std::vector<ElementOperacije> nadjiResenje(void);
 
 private:
     void kreirajPrvuGeneraciju(void);
+    void reprodukcija(void);
+    void mutacija(void);
 
     uint32_t m_rezultat;
     float m_konstantaMutacije;
@@ -32,6 +37,8 @@ private:
     std::vector<DNA> m_populaicja;
     std::vector<ElementOperacije> m_najboljaFormula;
     uint32_t m_najboljeResenje;
+
+    Random m_random;
 };
 
 #endif // _AI_H_

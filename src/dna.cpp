@@ -1,6 +1,10 @@
 #include "dna.h"
 
+#include <cmath>
+
 #include "random.h"
+#include "ai.h"
+#include "exception.h"
 
 DNA::DNA(const std::vector<ElementOperacije> &dna)
     : m_dna(dna)
@@ -67,12 +71,57 @@ DNA DNA::generisiSlucajnuFormulu(uint8_t brojOperanada)
     return DNA(dna);
 }
 
-float DNA::kvalitet(void)
+float DNA::kvalitet(uint32_t rezultat, const std::vector<uint32_t> &ponudjeniBrojevi)
 {
+    Matematika matematika;
+    std::vector<ElementOperacije> formula;
+
+    for(auto it = m_dna.begin(); it != m_dna.end(); it++)
+    {
+        formula.push_back(*it);
+        auto it2 = --formula.end();
+        if(it2->tip == TipElementaOperacijeOperand)
+        {
+            it2->vrednost.operand = ponudjeniBrojevi[it->vrednost.operand];
+        }
+    }
+
+    uint32_t resenje;
+    try {
+        resenje = matematika.racunajPostfoksnu(formula);
+    } catch(Exception &ex) {
+        return 0.0f;
+    }
+
+    uint32_t razlika;
+    uint32_t kolicnik;
+
+    if(resenje == rezultat)
+    {
+        return 1.0f;
+    } else if(resenje > rezultat)
+    {
+        razlika = resenje - rezultat;
+        kolicnik = resenje / rezultat;
+    } else
+    {
+        razlika = rezultat - resenje;
+        if(resenje == 0)
+            kolicnik = 0;
+        else
+            kolicnik = rezultat / resenje;
+    }
+
+    float kvalitet;
+    kvalitet = 1 / (float)(razlika + kolicnik);
+
+    return kvalitet;
 }
 
 DNA DNA::reprodukcija(const DNA &dna)
 {
+    Random random;
+    uint8_t granica = random.nextInt(std::min(m_dna.size(), dna.m_dna.size()));
 }
 
 void DNA::mutacija(float koeficientMutacije)
@@ -82,8 +131,19 @@ void DNA::mutacija(float koeficientMutacije)
     for(int i = 0; i < 6; i++)
         operandi.push_back(i);
     for(auto it = m_dna.begin(); it != m_dna.end(); it++)
+    {
         if(it->tip == TipElementaOperacijeOperand)
-            operandi.erase(operandi.begin() + it->vrednost.operand);
+        {
+            for(auto it2 = operandi.begin(); it2 != operandi.end(); it2++)
+            {
+                if(it->vrednost.operand == *it2)
+                {
+                    operandi.erase(it2);
+                    break;
+                }
+            }
+        }
+    }
 
     for(auto it = m_dna.begin(); it != m_dna.end(); it++)
     {

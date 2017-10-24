@@ -171,6 +171,8 @@ uint32_t Matematika::izvrsiOperaciju(uint32_t operand1, uint32_t operand2, Opera
             rezultat = operand1 * operand2;
             break;
         case OperatorPodeljeno:
+            if(operand2 == 0)
+                throw Exception("Deljenje sa nulom nije dozvoljeno");
             rezultat = operand1 / operand2;
             break;
         default:
