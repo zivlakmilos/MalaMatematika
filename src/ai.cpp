@@ -59,17 +59,21 @@ AI::~AI(void)
 std::vector<ElementOperacije> AI::nadjiResenje(void)
 {
     kreirajPrvuGeneraciju();
-    reprodukcija();
-    mutacija();
 
-    /*
-    for(auto it = m_populaicja.begin(); it != m_populaicja.end(); it++)
+    uint32_t i = 0;
+    while(true)
     {
-        std::cout << *it << std::endl;
-    }
-    */
+        reprodukcija();
+        mutacija();
 
-    return m_populaicja[0].getDna();
+        if(i++ > 10)
+            break;
+
+        if(m_najboljiKvalitet >= 1 || i++ > 10000)
+            break;
+    }
+
+    return m_najboljaFormula;
 }
 
 void AI::kreirajPrvuGeneraciju(void)
@@ -78,8 +82,13 @@ void AI::kreirajPrvuGeneraciju(void)
     m_populaicja.clear();
     for(int i = 0; i < m_velicinaPopulacije; i++)
     {
-        m_populaicja.push_back(DNA::generisiSlucajnuFormulu(random.nextInt(5) + 2));
+        m_populaicja.push_back(DNA::generisiSlucajnuFormulu(random.nextInt(2) + 2));
     }
+
+    auto it = m_populaicja.begin();
+    it->izracunajVrednost(m_ponudjeniBrojevi);
+    m_najboljaFormula = it->getFormula();
+    m_najboljiKvalitet = it->kvalitet(m_rezultat);
 }
 
 void AI::reprodukcija(void)
@@ -91,7 +100,15 @@ void AI::reprodukcija(void)
     std::vector<DNA> selekcija;
     for(auto it = m_populaicja.begin(); it != m_populaicja.end(); it++)
     {
-        float kvalitet = it->kvalitet(m_rezultat, m_ponudjeniBrojevi);
+        it->izracunajVrednost(m_ponudjeniBrojevi);
+
+        float kvalitet = it->kvalitet(m_rezultat);
+        if(kvalitet > m_najboljiKvalitet)
+        {
+            m_najboljiKvalitet = kvalitet;
+            m_najboljaFormula = it->getFormula();
+        }
+
         int broj = kvalitet * 1000;
         for(int i = 0; i < broj; i++)
         {

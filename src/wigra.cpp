@@ -309,11 +309,20 @@ void WIgra::btnObrisiClick(void)
 void WIgra::btnPotvrdiClick(void)
 {
     std::vector<uint32_t> tmp;
-    for(int i = 0; i < 6; i++)
-        tmp.push_back(i + 1);
-    AI ai(100, tmp);
+    for(int i = 1; i <= 6; i++)
+    {
+        QPushButton *btn = findChild<QPushButton*>("btnBroj" + QString::number(i));
+        if(btn)
+            tmp.push_back(btn->text().toInt());
+    }
+    uint32_t trazenoResenje = ui->lblTrazeniBroj1->text().toInt() * 100 +
+                              ui->lblTrazeniBroj2->text().toInt() * 10 +
+                              ui->lblTrazeniBroj3->text().toInt();
+    AI ai(trazenoResenje, tmp);
     m_formula = ai.nadjiResenje();
     prikaziFormulu();
+    uint32_t rezultat = m_matematika.racunajPostfoksnu(m_formula);
+    ui->lblRezultat1->setText(QString::number(rezultat));
     return;
 
     try {

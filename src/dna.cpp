@@ -7,11 +7,13 @@
 #include "exception.h"
 
 DNA::DNA(const std::vector<ElementOperacije> &dna)
-    : m_dna(dna)
+    : m_dna(dna),
+      m_rezultat(0)
 {
 }
 
 DNA::DNA(void)
+    : m_rezultat(0)
 {
 }
 
@@ -71,45 +73,49 @@ DNA DNA::generisiSlucajnuFormulu(uint8_t brojOperanada)
     return DNA(dna);
 }
 
-float DNA::kvalitet(uint32_t rezultat, const std::vector<uint32_t> &ponudjeniBrojevi)
+uint32_t DNA::izracunajVrednost(const std::vector<uint32_t> &ponudjeniBrojevi)
 {
     Matematika matematika;
-    std::vector<ElementOperacije> formula;
 
+    m_formula.clear();
     for(auto it = m_dna.begin(); it != m_dna.end(); it++)
     {
-        formula.push_back(*it);
-        auto it2 = --formula.end();
+        m_formula.push_back(*it);
+        auto it2 = --m_formula.end();
         if(it2->tip == TipElementaOperacijeOperand)
         {
             it2->vrednost.operand = ponudjeniBrojevi[it->vrednost.operand];
         }
     }
 
-    uint32_t resenje;
     try {
-        resenje = matematika.racunajPostfoksnu(formula);
+        m_rezultat =  matematika.racunajPostfoksnu(m_formula);
     } catch(Exception &ex) {
-        return 0.0f;
+        m_rezultat = 0;
     }
 
+    return m_rezultat;
+}
+
+float DNA::kvalitet(uint32_t rezultat)
+{
     uint32_t razlika;
     uint32_t kolicnik;
 
-    if(resenje == rezultat)
+    if(m_rezultat == rezultat)
     {
         return 1.0f;
-    } else if(resenje > rezultat)
+    } else if(m_rezultat > rezultat)
     {
-        razlika = resenje - rezultat;
-        kolicnik = resenje / rezultat;
+        razlika = m_rezultat - rezultat;
+        kolicnik = m_rezultat / rezultat;
     } else
     {
-        razlika = rezultat - resenje;
-        if(resenje == 0)
+        razlika = rezultat - m_rezultat;
+        if(m_rezultat == 0)
             kolicnik = 0;
         else
-            kolicnik = rezultat / resenje;
+            kolicnik = rezultat / m_rezultat;
     }
 
     float kvalitet;
@@ -120,8 +126,49 @@ float DNA::kvalitet(uint32_t rezultat, const std::vector<uint32_t> &ponudjeniBro
 
 DNA DNA::reprodukcija(const DNA &dna)
 {
+    std::vector<ElementOperacije> formula;
+
+    formula = m_dna;
+
+    int brOperanada = 1;
+    for(auto it = dna.m_dna.begin(); it != dna.m_dna.end(); it++)
+    {
+        if(it->tip == TipElementaOperacijeOperand)
+        {
+            bool ok = true;
+            for(auto it2 = formula.begin(); it2 != formula.end(); it2++)
+            {
+                if(it->vrednost.operand == it2->vrednost.operand)
+                {
+                    ok = false;
+                }
+            }
+
+            if(ok)
+            {
+                formula.push_back(*it);
+                brOperanada++;
+            }
+        } else
+        {
+            if(brOperanada >= 2)
+            {
+                formula.push_back(*it);
+                brOperanada--;
+            }
+        }
+    }
+
+    ElementOperacije element;
+    element.tip = TipElementaOperacijeOperator;
     Random random;
-    uint8_t granica = random.nextInt(std::min(m_dna.size(), dna.m_dna.size()));
+    while(--brOperanada > 0)
+    {
+        element.vrednost.operacija = static_cast<Operator>(random.nextInt(OperatorZagradaOtvorena));
+        formula.push_back(element);
+    }
+
+    return DNA(formula);
 }
 
 void DNA::mutacija(float koeficientMutacije)

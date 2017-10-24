@@ -36,7 +36,7 @@ private:
 
     std::vector<DNA> m_populaicja;
     std::vector<ElementOperacije> m_najboljaFormula;
-    uint32_t m_najboljeResenje;
+    float m_najboljiKvalitet;
 
     Random m_random;
 };
