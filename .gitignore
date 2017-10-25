@@ -1,6 +1,9 @@
 # Binary
 build/
 
+# Deploy
+deploy/
+
 # KDevelop
 *.kdev4
 .kdev4/
