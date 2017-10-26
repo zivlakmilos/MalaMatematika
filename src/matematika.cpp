@@ -156,6 +156,73 @@ std::vector<ElementOperacije> Matematika::pretvoriInfiksnuUPostfiksnu(const std:
     return izlaz;
 }
 
+std::vector<ElementOperacije> Matematika::pretvoriPostfiksnuUInfiksnu(const std::vector<ElementOperacije> &formula)
+{
+    std::stack<ElementOperacije> stek;
+    std::stack<std::deque<ElementOperacije>> stekIzlaza;
+
+    ElementOperacije zagradaOtvorena;
+    zagradaOtvorena.tip = TipElementaOperacijeOperator;
+    zagradaOtvorena.vrednost.operacija = OperatorZagradaOtvorena;
+    ElementOperacije zagradaZatvorena;
+    zagradaZatvorena.tip = TipElementaOperacijeOperator;
+    zagradaZatvorena.vrednost.operacija = OperatorZagradaZatvorena;
+
+    for(auto it = formula.begin(); it != formula.end(); it++)
+    {
+        if(it->tip == TipElementaOperacijeOperator)
+        {
+            if(stek.size() >= 2)
+            {
+                ElementOperacije operand2 = stek.top();
+                stek.pop();
+                ElementOperacije operand1 = stek.top();
+                stek.pop();
+
+                std::deque<ElementOperacije> izlaz;
+                izlaz.push_back(operand1);
+                izlaz.push_back(*it);
+                izlaz.push_back(operand2);
+                stekIzlaza.push(izlaz);
+            } else if(!stek.empty())
+            {
+                std::deque<ElementOperacije> izlaz = stekIzlaza.top();
+                stekIzlaza.pop();
+                ElementOperacije operand2 = stek.top();
+                stek.pop();
+
+                izlaz.push_front(zagradaOtvorena);
+                izlaz.push_back(zagradaZatvorena);
+                izlaz.push_back(*it);
+                izlaz.push_back(operand2);
+                stekIzlaza.push(izlaz);
+            } else if(stekIzlaza.size() >= 2)
+            {
+                std::deque<ElementOperacije> operand2 = stekIzlaza.top();
+                stekIzlaza.pop();
+                std::deque<ElementOperacije> operand1 = stekIzlaza.top();
+                stekIzlaza.pop();
+
+                operand1.push_front(zagradaOtvorena);
+                operand1.push_back(zagradaZatvorena);
+                operand1.push_back(*it);
+                operand1.push_back(zagradaOtvorena);
+                for(auto it2 = operand2.begin(); it2 != operand2.end(); it2++)
+                {
+                    operand1.push_back(*it2);
+                }
+                operand1.push_back(zagradaZatvorena);
+            }
+        } else
+        {
+            stek.push(*it);
+        }
+    }
+
+    std::deque<ElementOperacije> izlaz = stekIzlaza.top();
+    return std::vector<ElementOperacije>(izlaz.begin(), izlaz.end());
+}
+
 uint32_t Matematika::izvrsiOperaciju(uint32_t operand1, uint32_t operand2, Operator operacija)
 {
     uint32_t rezultat = 0;

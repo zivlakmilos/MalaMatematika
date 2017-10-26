@@ -320,9 +320,10 @@ void WIgra::btnPotvrdiClick(void)
                               ui->lblTrazeniBroj3->text().toInt();
     AI ai(trazenoResenje, tmp);
     m_formula = ai.nadjiResenje();
-    prikaziFormulu();
     uint32_t rezultat = m_matematika.racunajPostfoksnu(m_formula);
     ui->lblRezultat1->setText(QString::number(rezultat));
+    m_formula = m_matematika.pretvoriPostfiksnuUInfiksnu(m_formula);
+    prikaziFormulu();
     return;
 
     try {
