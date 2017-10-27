@@ -3,8 +3,9 @@
 
 #include <QWidget>
 
-#include <vector>
 #include <stdint.h>
+#include <vector>
+#include <thread>
 
 #include "random.h"
 #include "matematika.h"
@@ -23,9 +24,12 @@ public:
 
 private:
     void setupHandlers(void);
-    void prikaziFormulu(void);
+    QString pretvoriFormuluUString(const std::vector<ElementOperacije> &formula);
+    void pozoviAI(void);
 
     Ui::FrmIgra *ui;
+
+    std::thread m_aiThread;
 
     QTimer *m_tajmer;
 
@@ -33,6 +37,10 @@ private:
     uint8_t m_generisano;
     std::vector<ElementOperacije> m_formula;
     uint8_t m_brojZagrada;
+
+    uint32_t m_rezultat;
+    std::vector<uint32_t> m_ponudjeniBrojevi;
+    std::vector<ElementOperacije> m_formula2;
 
     Random m_random;
     Matematika m_matematika;

@@ -12,7 +12,8 @@ WIgra::WIgra(QWidget *parent)
       m_tajmer(new QTimer(this)),
       m_generisanjePokrenuto(false),
       m_generisano(0),
-      m_brojZagrada(0)
+      m_brojZagrada(0),
+      m_rezultat(0)
 {
     ui->setupUi(this);
     setupHandlers();
@@ -22,6 +23,8 @@ WIgra::~WIgra(void)
 {
     if(ui)
         delete ui;
+    if(m_aiThread.joinable())
+        m_aiThread.join();
 }
 
 void WIgra::setupHandlers(void)
@@ -62,10 +65,10 @@ void WIgra::setupHandlers(void)
             this, SLOT(btnPotvrdiClick()));
 }
 
-void WIgra::prikaziFormulu(void)
+QString WIgra::pretvoriFormuluUString(const std::vector<ElementOperacije> &formula)
 {
     QString str;
-    for(auto it = m_formula.begin(); it != m_formula.end(); it++)
+    for(auto it = formula.begin(); it != formula.end(); it++)
     {
         if(it->tip == TipElementaOperacijeOperator)
         {
@@ -96,7 +99,13 @@ void WIgra::prikaziFormulu(void)
         }
     }
 
-    ui->lblFormula1->setText(str);
+    return str;
+}
+
+void WIgra::pozoviAI(void)
+{
+    AI ai(m_rezultat, m_ponudjeniBrojevi);
+    m_formula2 = ai.nadjiResenje();
 }
 
 void WIgra::btnStopClick(void)
@@ -106,10 +115,14 @@ void WIgra::btnStopClick(void)
         m_generisano++;
     } else
     {
+        if(m_aiThread.joinable())
+            m_aiThread.join();
+
         m_generisanjePokrenuto = true;
         m_generisano = 0;
         m_brojZagrada = 0;
         m_formula.clear();
+        m_formula2.clear();
 
         ui->lblTrazeniBroj1->setText("");
         ui->lblTrazeniBroj2->setText("");
@@ -129,7 +142,9 @@ void WIgra::btnStopClick(void)
         ui->btnBroj6->setEnabled(true);
 
         ui->lblRezultat1->setText("");
-        prikaziFormulu();
+        ui->lblFormula1->setText("");
+        ui->lblRezultat2->setText("");
+        ui->lblFormula2->setText("");
 
         m_tajmer->start(100);
         ui->btnStop->setText(tr("STOP"));
@@ -186,6 +201,18 @@ void WIgra::tajmerTimeout(void)
         m_generisanjePokrenuto = false;
         m_tajmer->stop();
         ui->btnStop->setText(tr("NOVA IGRA"));
+
+        m_rezultat = ui->lblTrazeniBroj1->text().toInt() * 100 +
+                     ui->lblTrazeniBroj2->text().toInt() * 10 +
+                     ui->lblTrazeniBroj3->text().toInt();
+        m_ponudjeniBrojevi.clear();
+        for(int i = 1; i <= 6; i++)
+        {
+            QPushButton *btn = findChild<QPushButton*>("btnBroj" + QString::number(i));
+            if(btn)
+                m_ponudjeniBrojevi.push_back(btn->text().toInt());
+        }
+        m_aiThread = std::thread([this]() { pozoviAI(); });
     }
 }
 
@@ -209,7 +236,7 @@ void WIgra::dodajBrojUFormulu(void)
     m_formula.push_back(element);
     s->setEnabled(false);
 
-    prikaziFormulu();
+    ui->lblFormula1->setText(pretvoriFormuluUString(m_formula));
 }
 
 void WIgra::dodajOperacijuUFormulu(void)
@@ -269,7 +296,7 @@ void WIgra::dodajOperacijuUFormulu(void)
 
     m_formula.push_back(element);
 
-    prikaziFormulu();
+    ui->lblFormula1->setText(pretvoriFormuluUString(m_formula));
 }
 
 void WIgra::btnObrisiClick(void)
@@ -303,7 +330,7 @@ void WIgra::btnObrisiClick(void)
     }
 
     m_formula.pop_back();
-    prikaziFormulu();
+    ui->lblFormula1->setText(pretvoriFormuluUString(m_formula));
 }
 
 void WIgra::btnPotvrdiClick(void)
@@ -311,8 +338,18 @@ void WIgra::btnPotvrdiClick(void)
     try {
         uint32_t rezultat = m_matematika.racunajInfiksnu(m_formula);
         ui->lblRezultat1->setText(QString::number(rezultat));
+
+        if(m_aiThread.joinable())
+            m_aiThread.join();
+        rezultat = m_matematika.racunajPostfoksnu(m_formula2);
+        ui->lblFormula2->setText(pretvoriFormuluUString(
+            m_matematika.pretvoriPostfiksnuUInfiksnu(m_formula2)));
+        ui->lblRezultat2->setText(QString::number(rezultat));
     } catch(ExceptionZagrada &ex) {
         QMessageBox::warning(this, QCoreApplication::applicationName(),
                              tr("Nisu zatvorene sve zagrade"));
+    } catch(Exception &ex) {
+        QMessageBox::warning(this, QCoreApplication::applicationName(),
+                             tr("Greska prilikom racunanja formule"));
     }
 }
