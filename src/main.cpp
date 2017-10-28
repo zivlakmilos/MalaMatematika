@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include "wigra.h"
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,8 +10,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("Milos Zivlak");
     QCoreApplication::setOrganizationDomain("http://zivlak.ddns.net");
 
-    WIgra wIgra;
-    wIgra.show();
+    MainWindow window;
+    window.show();
 
     app.exec();
 }

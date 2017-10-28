@@ -24,6 +24,7 @@ set(SOURCES
     src/aithread.cpp
 
     src/wigra.cpp
+    src/mainwindow.cpp
 
     src/main.cpp
 )
@@ -31,6 +32,7 @@ set(SOURCES
 set(HEADERS
     include/aithread.h
     include/wigra.h
+    include/mainwindow.h
 )
 
 set(UI
