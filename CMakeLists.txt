@@ -21,6 +21,7 @@ set(SOURCES
     src/matematika.cpp
     src/dna.cpp
     src/ai.cpp
+    src/aithread.cpp
 
     src/wigra.cpp
 
@@ -28,6 +29,7 @@ set(SOURCES
 )
 
 set(HEADERS
+    include/aithread.h
     include/wigra.h
 )
 

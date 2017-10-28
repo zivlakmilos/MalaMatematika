@@ -4,16 +4,16 @@
 
 #include "ui_igra.h"
 #include "exceptionzagrada.h"
-#include "ai.h"
+#include "aithread.h"
 
 WIgra::WIgra(QWidget *parent)
     : QWidget(parent),
       ui(new Ui::FrmIgra()),
+      m_aiThread(new AIThread(this)),
       m_tajmer(new QTimer(this)),
       m_generisanjePokrenuto(false),
       m_generisano(0),
-      m_brojZagrada(0),
-      m_rezultat(0)
+      m_brojZagrada(0)
 {
     ui->setupUi(this);
     setupHandlers();
@@ -23,8 +23,6 @@ WIgra::~WIgra(void)
 {
     if(ui)
         delete ui;
-    if(m_aiThread.joinable())
-        m_aiThread.join();
 }
 
 void WIgra::setupHandlers(void)
@@ -63,6 +61,9 @@ void WIgra::setupHandlers(void)
             this, SLOT(btnObrisiClick()));
     connect(ui->btnPotvrdi, SIGNAL(clicked(bool)),
             this, SLOT(btnPotvrdiClick()));
+
+    connect(m_aiThread, SIGNAL(resenjeNadjeno(std::vector<ElementOperacije>)),
+            this, SLOT(aiNasaoResenje(std::vector<ElementOperacije>)));
 }
 
 QString WIgra::pretvoriFormuluUString(const std::vector<ElementOperacije> &formula)
@@ -102,12 +103,6 @@ QString WIgra::pretvoriFormuluUString(const std::vector<ElementOperacije> &formu
     return str;
 }
 
-void WIgra::pozoviAI(void)
-{
-    AI ai(m_rezultat, m_ponudjeniBrojevi);
-    m_formula2 = ai.nadjiResenje();
-}
-
 void WIgra::btnStopClick(void)
 {
     if(m_generisanjePokrenuto)
@@ -115,9 +110,6 @@ void WIgra::btnStopClick(void)
         m_generisano++;
     } else
     {
-        if(m_aiThread.joinable())
-            m_aiThread.join();
-
         m_generisanjePokrenuto = true;
         m_generisano = 0;
         m_brojZagrada = 0;
@@ -202,17 +194,17 @@ void WIgra::tajmerTimeout(void)
         m_tajmer->stop();
         ui->btnStop->setText(tr("NOVA IGRA"));
 
-        m_rezultat = ui->lblTrazeniBroj1->text().toInt() * 100 +
-                     ui->lblTrazeniBroj2->text().toInt() * 10 +
-                     ui->lblTrazeniBroj3->text().toInt();
-        m_ponudjeniBrojevi.clear();
+        uint32_t rezultat = ui->lblTrazeniBroj1->text().toInt() * 100 +
+                            ui->lblTrazeniBroj2->text().toInt() * 10 +
+                            ui->lblTrazeniBroj3->text().toInt();
+        std::vector<uint32_t> ponudjeniBrojevi;
         for(int i = 1; i <= 6; i++)
         {
             QPushButton *btn = findChild<QPushButton*>("btnBroj" + QString::number(i));
             if(btn)
-                m_ponudjeniBrojevi.push_back(btn->text().toInt());
+                ponudjeniBrojevi.push_back(btn->text().toInt());
         }
-        m_aiThread = std::thread([this]() { pozoviAI(); });
+        m_aiThread->pokreni(rezultat, ponudjeniBrojevi);
     }
 }
 
@@ -339,12 +331,13 @@ void WIgra::btnPotvrdiClick(void)
         uint32_t rezultat = m_matematika.racunajInfiksnu(m_formula);
         ui->lblRezultat1->setText(QString::number(rezultat));
 
-        if(m_aiThread.joinable())
-            m_aiThread.join();
-        rezultat = m_matematika.racunajPostfoksnu(m_formula2);
-        ui->lblFormula2->setText(pretvoriFormuluUString(
-            m_matematika.pretvoriPostfiksnuUInfiksnu(m_formula2)));
-        ui->lblRezultat2->setText(QString::number(rezultat));
+        if(!m_formula2.empty())
+        {
+            rezultat = m_matematika.racunajPostfoksnu(m_formula2);
+            ui->lblFormula2->setText(pretvoriFormuluUString(
+                m_matematika.pretvoriPostfiksnuUInfiksnu(m_formula2)));
+            ui->lblRezultat2->setText(QString::number(rezultat));
+        }
     } catch(ExceptionZagrada &ex) {
         QMessageBox::warning(this, QCoreApplication::applicationName(),
                              tr("Nisu zatvorene sve zagrade"));
@@ -353,3 +346,9 @@ void WIgra::btnPotvrdiClick(void)
                              tr("Greska prilikom racunanja formule"));
     }
 }
+
+void WIgra::aiNasaoResenje(std::vector<ElementOperacije> formula)
+{
+    m_formula2 = formula;
+}
+

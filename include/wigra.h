@@ -14,6 +14,8 @@ namespace Ui {
     class FrmIgra;
 }
 
+class AIThread;
+
 class WIgra : public QWidget
 {
     Q_OBJECT
@@ -29,7 +31,7 @@ private:
 
     Ui::FrmIgra *ui;
 
-    std::thread m_aiThread;
+    AIThread *m_aiThread;
 
     QTimer *m_tajmer;
 
@@ -38,8 +40,6 @@ private:
     std::vector<ElementOperacije> m_formula;
     uint8_t m_brojZagrada;
 
-    uint32_t m_rezultat;
-    std::vector<uint32_t> m_ponudjeniBrojevi;
     std::vector<ElementOperacije> m_formula2;
 
     Random m_random;
@@ -52,6 +52,7 @@ private slots:
     void dodajOperacijuUFormulu(void);
     void btnObrisiClick(void);
     void btnPotvrdiClick(void);
+    void aiNasaoResenje(std::vector<ElementOperacije> formula);
 };
 
 #endif // _W_IGRA_H_
