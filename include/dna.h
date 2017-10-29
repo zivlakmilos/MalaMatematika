@@ -2,6 +2,7 @@
 #define _DNA_H_
 
 #include "matematika.h"
+#include "random.h"
 
 class AI;
 
@@ -26,6 +27,9 @@ private:
     std::vector<ElementOperacije> m_dna;
     std::vector<ElementOperacije> m_formula;
     uint32_t m_rezultat;
+
+    std::vector<uint8_t> m_slobodniOperandi;
+    Random m_random;
 };
 
 #endif // _DNA_H_

@@ -27,7 +27,6 @@ public:
 private:
     void kreirajPrvuGeneraciju(void);
     void reprodukcija(void);
-    void mutacija(void);
 
     uint32_t m_rezultat;
     float m_konstantaMutacije;

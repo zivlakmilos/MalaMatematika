@@ -64,12 +64,8 @@ std::vector<ElementOperacije> AI::nadjiResenje(void)
     while(true)
     {
         reprodukcija();
-        mutacija();
 
-        if(i++ > 10)
-            break;
-
-        if(m_najboljiKvalitet >= 1 || i++ > 10000)
+        if(m_najboljiKvalitet >= 1 || i++ > 100)
             break;
     }
 
@@ -126,11 +122,6 @@ void AI::reprodukcija(void)
         DNA roditelj1 = selekcija[m_random.nextInt(selekcija.size())];
         DNA roditelj2 = selekcija[m_random.nextInt(selekcija.size())];
         m_populaicja.push_back(roditelj1.reprodukcija(roditelj2));
+        (--m_populaicja.end())->mutacija(m_konstantaMutacije);
     }
-}
-
-void AI::mutacija(void)
-{
-    for(auto it = m_populaicja.begin(); it != m_populaicja.end(); it++)
-        it->mutacija(m_konstantaMutacije);
 }

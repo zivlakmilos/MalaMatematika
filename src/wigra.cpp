@@ -334,8 +334,9 @@ void WIgra::btnPotvrdiClick(void)
         if(!m_formula2.empty())
         {
             rezultat = m_matematika.racunajPostfoksnu(m_formula2);
-            ui->lblFormula2->setText(pretvoriFormuluUString(
-                m_matematika.pretvoriPostfiksnuUInfiksnu(m_formula2)));
+            //ui->lblFormula2->setText(pretvoriFormuluUString(
+                //m_matematika.pretvoriPostfiksnuUInfiksnu(m_formula2)));
+            ui->lblFormula2->setText(pretvoriFormuluUString(m_formula2));
             ui->lblRezultat2->setText(QString::number(rezultat));
         }
     } catch(ExceptionZagrada &ex) {

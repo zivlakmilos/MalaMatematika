@@ -70,7 +70,9 @@ DNA DNA::generisiSlucajnuFormulu(uint8_t brojOperanada)
         dna.push_back(element);
     }
 
-    return DNA(dna);
+    DNA result(dna);
+    result.m_slobodniOperandi = operandi;
+    return result;
 }
 
 uint32_t DNA::izracunajVrednost(const std::vector<uint32_t> &ponudjeniBrojevi)
@@ -126,28 +128,22 @@ float DNA::kvalitet(uint32_t rezultat)
 
 DNA DNA::reprodukcija(const DNA &dna)
 {
-    std::vector<ElementOperacije> formula;
-
-    formula = m_dna;
+    std::vector<ElementOperacije> formula = m_dna;
 
     int brOperanada = 1;
     for(auto it = dna.m_dna.begin(); it != dna.m_dna.end(); it++)
     {
         if(it->tip == TipElementaOperacijeOperand)
         {
-            bool ok = true;
-            for(auto it2 = formula.begin(); it2 != formula.end(); it2++)
+            for(auto it2 = m_slobodniOperandi.begin(); it2 != m_slobodniOperandi.end(); it2++)
             {
-                if(it->vrednost.operand == it2->vrednost.operand)
+                if(it->vrednost.operand == *it2)
                 {
-                    ok = false;
+                    formula.push_back(*it);
+                    brOperanada++;
+                    m_slobodniOperandi.erase(it2);
+                    break;
                 }
-            }
-
-            if(ok)
-            {
-                formula.push_back(*it);
-                brOperanada++;
             }
         } else
         {
@@ -173,39 +169,20 @@ DNA DNA::reprodukcija(const DNA &dna)
 
 void DNA::mutacija(float koeficientMutacije)
 {
-    Random random;
-    std::vector<uint8_t> operandi;
-    for(int i = 0; i < 6; i++)
-        operandi.push_back(i);
     for(auto it = m_dna.begin(); it != m_dna.end(); it++)
     {
-        if(it->tip == TipElementaOperacijeOperand)
-        {
-            for(auto it2 = operandi.begin(); it2 != operandi.end(); it2++)
-            {
-                if(it->vrednost.operand == *it2)
-                {
-                    operandi.erase(it2);
-                    break;
-                }
-            }
-        }
-    }
-
-    for(auto it = m_dna.begin(); it != m_dna.end(); it++)
-    {
-        if(random.nextFloat() <= koeficientMutacije)
+        if(m_random.nextFloat() <= koeficientMutacije)
         {
             if(it->tip == TipElementaOperacijeOperator)
             {
-                it->vrednost.operacija = static_cast<Operator>(random.nextInt(OperatorZagradaOtvorena));
+                it->vrednost.operacija = static_cast<Operator>(m_random.nextInt(OperatorZagradaOtvorena));
             } else
             {
-                if(!operandi.empty())
+                if(!m_slobodniOperandi.empty())
                 {
-                    uint8_t index = random.nextInt(operandi.size());
-                    it->vrednost.operand = operandi[index];
-                    operandi.erase(operandi.begin() + index);
+                    uint8_t index = m_random.nextInt(m_slobodniOperandi.size());
+                    it->vrednost.operand = m_slobodniOperandi[index];
+                    m_slobodniOperandi.erase(m_slobodniOperandi.begin() + index);
                 }
             }
         }
