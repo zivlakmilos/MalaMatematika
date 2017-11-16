@@ -65,7 +65,15 @@ std::vector<ElementOperacije> AI::nadjiResenje(void)
     {
         reprodukcija();
 
-        if(m_najboljiKvalitet >= 1 || i++ > 100)
+        std::cout << "============================================"<< std::endl;
+        for(auto it = m_populaicja.begin(); it != m_populaicja.end(); it++)
+        {
+            std::cout << *it << std::endl;
+        }
+        std::cout << DNA(m_najboljaFormula) << "\t"
+                  << m_najboljiKvalitet << std::endl;
+
+        if(m_najboljiKvalitet >= 1.0f || i++ > 100)
             break;
     }
 
@@ -94,6 +102,7 @@ void AI::reprodukcija(void)
      */
 
     std::vector<DNA> selekcija;
+    float sum = 0.0f;
     for(auto it = m_populaicja.begin(); it != m_populaicja.end(); it++)
     {
         it->izracunajVrednost(m_ponudjeniBrojevi);
@@ -105,7 +114,9 @@ void AI::reprodukcija(void)
             m_najboljaFormula = it->getFormula();
         }
 
-        int broj = kvalitet * 1000;
+        int broj = kvalitet * 100;
+        if(broj <= 0)
+            broj = 1;
         for(int i = 0; i < broj; i++)
         {
             selekcija.push_back(*it);

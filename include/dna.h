@@ -28,7 +28,6 @@ private:
     std::vector<ElementOperacije> m_formula;
     uint32_t m_rezultat;
 
-    std::vector<uint8_t> m_slobodniOperandi;
     Random m_random;
 };
 

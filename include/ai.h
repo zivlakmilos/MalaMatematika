@@ -6,7 +6,7 @@
 #include "random.h"
 
 #define AI_PODRAZUMEVANA_KONSTANTA_MUTACIJE         0.01f
-#define AI_PODRAZUMEVANA_VELICINA_POPULACIJE        1000
+#define AI_PODRAZUMEVANA_VELICINA_POPULACIJE        100
 
 class AI
 {

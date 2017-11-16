@@ -71,7 +71,6 @@ DNA DNA::generisiSlucajnuFormulu(uint8_t brojOperanada)
     }
 
     DNA result(dna);
-    result.m_slobodniOperandi = operandi;
     return result;
 }
 
@@ -104,6 +103,21 @@ float DNA::kvalitet(uint32_t rezultat)
     uint32_t razlika;
     uint32_t kolicnik;
 
+    bool operandi[6];
+    for(int i = 0; i < 6; i++)
+        operandi[i] = false;
+    for(auto it = m_dna.begin(); it != m_dna.end(); it++)
+    {
+        int i = it->vrednost.operand;
+        if(it->tip == TipElementaOperacijeOperand)
+        {
+            if(operandi[i])
+                return 0.0;
+            else
+                operandi[i] = true;
+        }
+    }
+
     if(m_rezultat == rezultat)
     {
         return 1.0f;
@@ -130,37 +144,25 @@ DNA DNA::reprodukcija(const DNA &dna)
 {
     std::vector<ElementOperacije> formula = m_dna;
 
-    int brOperanada = 1;
+    int brojOperanada = 1;
     for(auto it = dna.m_dna.begin(); it != dna.m_dna.end(); it++)
     {
         if(it->tip == TipElementaOperacijeOperand)
         {
-            for(auto it2 = m_slobodniOperandi.begin(); it2 != m_slobodniOperandi.end(); it2++)
-            {
-                if(it->vrednost.operand == *it2)
-                {
-                    formula.push_back(*it);
-                    brOperanada++;
-                    m_slobodniOperandi.erase(it2);
-                    break;
-                }
-            }
-        } else
+            formula.push_back(*it);
+            brojOperanada++;
+        } else if(brojOperanada >= 2)
         {
-            if(brOperanada >= 2)
-            {
-                formula.push_back(*it);
-                brOperanada--;
-            }
+            formula.push_back(*it);
+            brojOperanada--;
         }
     }
 
     ElementOperacije element;
     element.tip = TipElementaOperacijeOperator;
-    Random random;
-    while(--brOperanada > 0)
+    while(--brojOperanada > 0)
     {
-        element.vrednost.operacija = static_cast<Operator>(random.nextInt(OperatorZagradaOtvorena));
+        element.vrednost.operacija = static_cast<Operator>(m_random.nextInt(OperatorZagradaOtvorena));
         formula.push_back(element);
     }
 
@@ -178,12 +180,7 @@ void DNA::mutacija(float koeficientMutacije)
                 it->vrednost.operacija = static_cast<Operator>(m_random.nextInt(OperatorZagradaOtvorena));
             } else
             {
-                if(!m_slobodniOperandi.empty())
-                {
-                    uint8_t index = m_random.nextInt(m_slobodniOperandi.size());
-                    it->vrednost.operand = m_slobodniOperandi[index];
-                    m_slobodniOperandi.erase(m_slobodniOperandi.begin() + index);
-                }
+                it->vrednost.operand = m_random.nextInt(6);
             }
         }
     }
