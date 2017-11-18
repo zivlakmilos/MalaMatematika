@@ -18,6 +18,7 @@ set(SOURCES
     src/core/exception.cpp
     src/core/exceptionzagrada.cpp
     src/core/random.cpp
+    src/algorithm/tree.cpp
     src/matematika.cpp
     src/dna.cpp
     src/ai.cpp
