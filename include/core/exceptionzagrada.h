@@ -1,7 +1,7 @@
 #ifndef _EXCEPTION_ZAGRADA_H_
 #define _EXCEPTION_ZAGRADA_H_
 
-#include "exception.h"
+#include "core/exception.h"
 
 class ExceptionZagrada : public Exception
 {

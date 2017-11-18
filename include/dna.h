@@ -2,7 +2,7 @@
 #define _DNA_H_
 
 #include "matematika.h"
-#include "random.h"
+#include "core/random.h"
 
 class AI;
 

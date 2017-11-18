@@ -7,7 +7,7 @@
 #include <vector>
 #include <thread>
 
-#include "random.h"
+#include "core/random.h"
 #include "matematika.h"
 
 namespace Ui {

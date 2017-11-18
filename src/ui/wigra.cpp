@@ -1,9 +1,9 @@
-#include "wigra.h"
+#include "ui/wigra.h"
 
 #include <QtGui>
 
 #include "ui_igra.h"
-#include "exceptionzagrada.h"
+#include "core/exceptionzagrada.h"
 #include "aithread.h"
 
 WIgra::WIgra(QWidget *parent)

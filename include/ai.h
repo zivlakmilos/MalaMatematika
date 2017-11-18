@@ -3,7 +3,7 @@
 
 #include "dna.h"
 #include "matematika.h"
-#include "random.h"
+#include "core/random.h"
 
 #define AI_PODRAZUMEVANA_KONSTANTA_MUTACIJE         0.01f
 #define AI_PODRAZUMEVANA_VELICINA_POPULACIJE        100

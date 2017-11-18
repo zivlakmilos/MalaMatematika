@@ -1,6 +1,6 @@
 #include "ai.h"
 
-#include "random.h"
+#include "core/random.h"
 
 /*
  * Samo za debug

@@ -1,8 +1,8 @@
-#include "mainwindow.h"
+#include "ui/mainwindow.h"
 
 #include <QtGui>
 
-#include "wigra.h"
+#include "ui/wigra.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

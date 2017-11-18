@@ -15,24 +15,24 @@ include_directories(include/)
 include(${QT_USE_FILE})
 
 set(SOURCES
-    src/exception.cpp
-    src/exceptionzagrada.cpp
-    src/random.cpp
+    src/core/exception.cpp
+    src/core/exceptionzagrada.cpp
+    src/core/random.cpp
     src/matematika.cpp
     src/dna.cpp
     src/ai.cpp
     src/aithread.cpp
 
-    src/wigra.cpp
-    src/mainwindow.cpp
+    src/ui/wigra.cpp
+    src/ui/mainwindow.cpp
 
     src/main.cpp
 )
 
 set(HEADERS
     include/aithread.h
-    include/wigra.h
-    include/mainwindow.h
+    include/ui/wigra.h
+    include/ui/mainwindow.h
 )
 
 set(UI

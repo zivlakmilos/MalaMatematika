@@ -2,9 +2,9 @@
 
 #include <cmath>
 
-#include "random.h"
+#include "core/random.h"
+#include "core/exception.h"
 #include "ai.h"
-#include "exception.h"
 
 DNA::DNA(const std::vector<ElementOperacije> &dna)
     : m_dna(dna),
