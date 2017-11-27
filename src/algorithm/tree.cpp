@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include <iostream>
+
 Tree::Tree(void)
     : m_root(nullptr)
 {
@@ -66,6 +68,32 @@ std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
         nodes.push_back(node);
     }
 
+    for(auto it = nodes.begin(); it != nodes.end(); it++)
+    {
+        if(it->type == NodeTypeOperator)
+        {
+            switch(it->value)
+            {
+                case OperatorPlus:
+                    std::cout << '+';
+                    break;
+                case OperatorMinus:
+                    std::cout << '-';
+                    break;
+                case OperatorTimes:
+                    std::cout << '*';
+                    break;
+                case OperatorOver:
+                    std::cout << '/';
+                    break;
+            }
+        } else
+        {
+            std::cout << it->value;
+        }
+    }
+    std::cout << std::endl;
+
     auto it = nodes.rbegin();
 
     std::shared_ptr<Tree> tree = std::make_shared<Tree>();
@@ -109,17 +137,17 @@ std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
     return tree;
 }
 
-uint32_t Tree::calculate(void) const
+int32_t Tree::calculate(void) const
 {
     return calculate(m_root);
 }
 
-uint32_t Tree::calculate(const std::vector<uint32_t> &numbers) const
+int32_t Tree::calculate(const std::vector<int32_t> &numbers) const
 {
-    calculate(numbers);
+    return calculate(m_root, numbers);
 }
 
-uint32_t Tree::calculateDepth(void) const
+int32_t Tree::calculateDepth(void) const
 {
     return calculateDepth(m_root, 0);
 }
@@ -180,29 +208,29 @@ void Tree::deleteNode(Node *node)
     delete node;
 }
 
-uint32_t Tree::calculate(Node *node) const
+int32_t Tree::calculate(Node *node) const
 {
     if(node->type == NodeType::NodeTypeOperand)
         return node->value;
 
-    uint32_t operand1 = calculate(node->left);
-    uint32_t operand2 = calculate(node->right);
+    int32_t operand1 = calculate(node->left);
+    int32_t operand2 = calculate(node->right);
 
     return doCalculation(static_cast<Operator>(node->value), operand1, operand2);
 }
 
-uint32_t Tree::calculate(Node *node, const std::vector<uint32_t> &number) const
+int32_t Tree::calculate(Node *node, const std::vector<int32_t> &numbers) const
 {
     if(node->type == NodeType::NodeTypeOperand)
-        return node->value;
+        return numbers[node->value];
 
-    uint32_t operand1 = calculate(node->left, number);
-    uint32_t operand2 = calculate(node->right, number);
+    int32_t operand1 = calculate(node->left, numbers);
+    int32_t operand2 = calculate(node->right, numbers);
 
-    return doCalculation(static_cast<Operator>(node->value), number[operand1], number[operand2]);
+    return doCalculation(static_cast<Operator>(node->value), operand1, operand2);
 }
 
-uint32_t Tree::doCalculation(Operator operation, uint32_t operand1, uint32_t operand2) const
+int32_t Tree::doCalculation(Operator operation, int32_t operand1, int32_t operand2) const
 {
     switch(operation)
     {
@@ -216,28 +244,27 @@ uint32_t Tree::doCalculation(Operator operation, uint32_t operand1, uint32_t ope
             return operand1 * operand2;
             break;
         case Operator::OperatorOver:
-            return operand2 && !(operand1 % operand2) ? operand1 / operand2 : operand1;
+            return !operand2 || (operand1 % operand2) ? operand1 : operand1 / operand2;
             break;
     }
 
     return 0;
 }
 
-uint32_t Tree::calculateDepth(Node *node, uint32_t depth) const
+int32_t Tree::calculateDepth(Node *node, int32_t depth) const
 {
     if(!node)
         return depth;
 
-    uint32_t depthLeft = calculateDepth(node->left, depth + 1);
-    uint32_t depthRight = calculateDepth(node->right, depth + 1);
+    int32_t depthLeft = calculateDepth(node->left, depth + 1);
+    int32_t depthRight = calculateDepth(node->right, depth + 1);
 
     return depthLeft > depthRight ? depthLeft : depthRight;
 }
 
 std::ostream &operator<<(std::ostream &os, const Tree& tree)
 {
-    /*
-    uint32_t depth = tree.calculateDepth();
+    int32_t depth = tree.calculateDepth();
     std::vector<Node*> tmp;
     std::vector<Node*> nodes;
     nodes.push_back(tree.m_root);
@@ -277,9 +304,6 @@ std::ostream &operator<<(std::ostream &os, const Tree& tree)
         nodes = tmp;
         tmp.clear();
     }
-    */
-
-    std::cout << "Binary tree" << std::endl;
 
     return os;
 }
