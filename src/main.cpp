@@ -11,7 +11,7 @@ int main(void)
 
     std::shared_ptr<Tree> tree = Tree::generateRandomTree(5);
     std::cout << *tree << std::endl;
-    //std::cout << tree->calculate() << std::endl;
+    std::cout << tree->calculate() << std::endl;
     std::cout << tree->calculate(brojevi) << std::endl;
 
     return 0;

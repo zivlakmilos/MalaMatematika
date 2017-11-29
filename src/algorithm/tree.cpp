@@ -7,8 +7,6 @@
 
 #include <iostream>
 
-#include <iostream>
-
 Tree::Tree(void)
     : m_root(nullptr)
 {
@@ -206,6 +204,45 @@ void Tree::deleteNode(Node *node)
     deleteNode(node->right);
 
     delete node;
+}
+
+bool Tree::swapNodes(Node *node1, Node *node2)
+{
+    if(!node1 || !node2 || node1 == m_root || node2 == m_root)
+        return false;
+    if(node1 == node2)
+        return true;
+
+    Node *parent1 = node1->parent;
+    Node *parent2 = node2->parent;
+
+    if(parent1 == parent2)
+    {
+        Node *tmp = parent1->left;
+        parent1->left = parent1->right;
+        parent1->right = tmp;
+    } else
+    {
+        node1->parent = parent2;
+        node2->parent = parent1;
+
+        if(parent1)
+        {
+            if(parent1->left == node1)
+                parent1->left = node2;
+            else if(parent1->right == node1)
+                parent1->right = node2;
+        }
+        if(parent2)
+        {
+            if(parent2->left == node2)
+                parent2->left = node1;
+            else if(parent2->right == node2)
+                parent2->right = node1;
+        }
+    }
+
+    return true;
 }
 
 int32_t Tree::calculate(Node *node) const

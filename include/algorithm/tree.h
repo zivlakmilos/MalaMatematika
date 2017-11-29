@@ -58,6 +58,7 @@ private:
     void createRoot(const Node &node);
     bool addNode(const Node &node, ChildPosition position, Node *parent);
     void deleteNode(Node *node);
+    bool swapNodes(Node *node1, Node *node2);
 
     int32_t calculate(Node *node) const;
     int32_t calculate(Node *node, const std::vector<int32_t> &numbers) const;
