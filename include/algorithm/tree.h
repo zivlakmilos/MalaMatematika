@@ -36,11 +36,19 @@ struct Node
     Node *right;
 };
 
+struct NodeValue
+{
+    int32_t value;
+    Node *node;
+};
+
 class Tree
 {
 public:
     Tree(void);
     ~Tree(void);
+
+    static void test(void);
 
     static std::shared_ptr<Tree> generateRandomTree(int operandCount);
 
@@ -49,6 +57,8 @@ public:
 
     int32_t calculate(void) const;
     int32_t calculate(const std::vector<int32_t> &numbers) const;
+
+    void reduce(const std::vector<int32_t> &numbers);
 
     int32_t calculateDepth(void) const;
 
@@ -64,6 +74,8 @@ private:
     int32_t calculate(Node *node, const std::vector<int32_t> &numbers) const;
     int32_t doCalculation(Operator operation, int32_t operand1, int32_t operand2) const;
     int32_t calculateDepth(Node *node, int32_t depth) const;
+
+    Node *reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer);
 
     Node *m_root;
 };

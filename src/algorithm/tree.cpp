@@ -17,6 +17,39 @@ Tree::~Tree(void)
     deleteNode(m_root);
 }
 
+void Tree::test(void)
+{
+    Tree tree;
+    Node node;
+
+    std::vector<int32_t> numbers = { 0, 1, 2, 3, 50, 100 };
+
+    node.type = NodeTypeOperator;
+    node.value = OperatorMinus;
+    tree.createRoot(node);
+
+    node.type = NodeTypeOperator;
+    node.value = OperatorPlus;
+    tree.addNode(node, ChildPositionLeft, tree.m_root);
+
+    node.type = NodeTypeOperand;
+    node.value = 1;
+    tree.addNode(node, ChildPositionRight, tree.m_root);
+
+    node.type = NodeTypeOperand;
+    node.value = 0;
+    tree.addNode(node, ChildPositionLeft, tree.m_root->left);
+
+    node.type = NodeTypeOperand;
+    node.value = 2;
+    tree.addNode(node, ChildPositionRight, tree.m_root->left);
+
+    tree.reduce(numbers);
+
+    std::cout << tree << std::endl;
+              //<< tree.calculate(numbers) << std::endl;
+}
+
 std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
 {
     Random random;
@@ -150,6 +183,19 @@ int32_t Tree::calculateDepth(void) const
     return calculateDepth(m_root, 0);
 }
 
+void Tree::reduce(const std::vector<int32_t> &numbers)
+{
+    std::vector<NodeValue> buffer;
+    Node *node = reduce(m_root, numbers, buffer);
+    if(node)
+    {
+        Node newNode;
+        newNode.type = node->type;
+        newNode.value = node->value;
+        createRoot(newNode);
+    }
+}
+
 void Tree::createRoot(const Node &node)
 {
     if(m_root)
@@ -196,10 +242,13 @@ void Tree::deleteNode(Node *node)
     if(!node)
         return;
 
-    if(node->left)
-        node->left->parent = nullptr;
-    if(node->right)
-        node->right->parent = nullptr;
+    if(node->parent)
+    {
+        if(node->parent->left == node)
+            node->parent->left = nullptr;
+        if(node->parent->right == node)
+            node->parent->right = nullptr;
+    }
     deleteNode(node->left);
     deleteNode(node->right);
 
@@ -297,6 +346,52 @@ int32_t Tree::calculateDepth(Node *node, int32_t depth) const
     int32_t depthRight = calculateDepth(node->right, depth + 1);
 
     return depthLeft > depthRight ? depthLeft : depthRight;
+}
+
+Node *Tree::reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer)
+{
+    if(!node)
+        return nullptr;
+
+    if(node->type == NodeTypeOperand)
+    {
+        NodeValue nodeValue;
+        nodeValue.node = node;
+        nodeValue.value = numbers[node->value];
+        buffer.push_back(nodeValue);
+        return nullptr;
+    }
+
+    Node *left = reduce(node->left, numbers, buffer);
+    if(left)
+    {
+        Node newNode;
+        newNode.type = left->type;
+        newNode.value = left->value;
+        deleteNode(node->left);
+        addNode(newNode, ChildPositionLeft, node);
+    }
+
+    Node *right = reduce(node->right, numbers, buffer);
+    if(right)
+    {
+        Node newNode;
+        newNode.type = right->type;
+        newNode.value = right->value;
+        deleteNode(node->right);
+        addNode(newNode, ChildPositionRight, node);
+    }
+
+    int32_t result = calculate(node, numbers);
+    for(auto it = buffer.begin(); it != buffer.end(); it++)
+    {
+        if(it->value == result)
+        {
+            return it->node;
+        }
+    }
+
+    return nullptr;
 }
 
 std::ostream &operator<<(std::ostream &os, const Tree& tree)
