@@ -52,6 +52,9 @@ public:
 
     static std::shared_ptr<Tree> generateRandomTree(int operandCount);
 
+    static std::shared_ptr<Tree> crossover(const std::shared_ptr<Tree> &parent1,
+                                           const std::shared_ptr<Tree> &parent2);
+
     inline Node *getRoot(void) { return m_root; }
     inline void setRoot(Node *root) { m_root = root; }
 
@@ -62,6 +65,8 @@ public:
 
     int32_t calculateDepth(void) const;
 
+    std::shared_ptr<Tree> duplicate(void);
+
     friend std::ostream &operator<<(std::ostream &os, const Tree &tree);
 
 private:
@@ -69,6 +74,7 @@ private:
     bool addNode(const Node &node, ChildPosition position, Node *parent);
     void deleteNode(Node *node);
     bool swapNodes(Node *node1, Node *node2);
+    Node *copyNode(Node *node);
 
     int32_t calculate(Node *node) const;
     int32_t calculate(Node *node, const std::vector<int32_t> &numbers) const;

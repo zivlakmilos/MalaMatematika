@@ -44,10 +44,11 @@ void Tree::test(void)
     node.value = 2;
     tree.addNode(node, ChildPositionRight, tree.m_root->left);
 
-    tree.reduce(numbers);
+    std::shared_ptr<Tree> tree2 = tree.duplicate();
+    tree2->reduce(numbers);
 
     std::cout << tree << std::endl;
-              //<< tree.calculate(numbers) << std::endl;
+    std::cout << *tree2 << std::endl;
 }
 
 std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
@@ -168,6 +169,12 @@ std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
     return tree;
 }
 
+std::shared_ptr<Tree> Tree::crossover(const std::shared_ptr<Tree> &parent1,
+                                      const std::shared_ptr<Tree> &parent2)
+{
+    std::shared_ptr<Tree> result = parent1;
+}
+
 int32_t Tree::calculate(void) const
 {
     return calculate(m_root);
@@ -194,6 +201,22 @@ void Tree::reduce(const std::vector<int32_t> &numbers)
         newNode.value = node->value;
         createRoot(newNode);
     }
+}
+
+std::shared_ptr<Tree> Tree::duplicate(void)
+{
+    std::shared_ptr<Tree> result = std::make_shared<Tree>();
+
+    result->createRoot(*m_root);
+    result->m_root->left = copyNode(m_root->left);
+    result->m_root->right = copyNode(m_root->right);
+
+    if(result->m_root->left)
+        result->m_root->left->parent = result->m_root;
+    if(result->m_root->right)
+        result->m_root->right->parent = result->m_root;
+
+    return result;
 }
 
 void Tree::createRoot(const Node &node)
@@ -292,6 +315,26 @@ bool Tree::swapNodes(Node *node1, Node *node2)
     }
 
     return true;
+}
+
+Node *Tree::copyNode(Node *node)
+{
+    if(!node)
+        return nullptr;
+
+    Node *result = new Node;
+    result->type = node->type;
+    result->value = node->value;
+
+    result->left = copyNode(node->left);
+    result->right = copyNode(node->right);
+
+    if(result->left)
+        result->left->parent = result;
+    if(result->right)
+        result->right->parent = result;
+
+    return result;
 }
 
 int32_t Tree::calculate(Node *node) const
