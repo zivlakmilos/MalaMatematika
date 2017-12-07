@@ -63,7 +63,8 @@ public:
 
     void reduce(const std::vector<int32_t> &numbers);
 
-    int32_t calculateDepth(void) const;
+    uint32_t calculateDepth(void) const;
+    uint32_t calculateSize(void) const;
 
     std::shared_ptr<Tree> duplicate(void);
 
@@ -75,11 +76,13 @@ private:
     void deleteNode(Node *node);
     bool swapNodes(Node *node1, Node *node2);
     Node *copyNode(Node *node);
+    Node *getRandomNode(void);
 
     int32_t calculate(Node *node) const;
     int32_t calculate(Node *node, const std::vector<int32_t> &numbers) const;
     int32_t doCalculation(Operator operation, int32_t operand1, int32_t operand2) const;
-    int32_t calculateDepth(Node *node, int32_t depth) const;
+    uint32_t calculateDepth(Node *node, int32_t depth) const;
+    uint32_t calculateSize(Node *node) const;
 
     Node *reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer);
 

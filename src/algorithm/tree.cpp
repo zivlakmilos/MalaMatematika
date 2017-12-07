@@ -49,6 +49,20 @@ void Tree::test(void)
 
     std::cout << tree << std::endl;
     std::cout << *tree2 << std::endl;
+
+    std::shared_ptr<Tree> tmp = Tree::generateRandomTree(6);
+
+    Node *random1 = tmp->getRandomNode();
+    Node *random2 = tmp->getRandomNode();
+    Node *random3 = tmp->getRandomNode();
+    Node *random4 = tmp->getRandomNode();
+    Node *random5 = tmp->getRandomNode();
+
+    std::cout << random1->value << std::endl
+              << random2->value << std::endl
+              << random3->value << std::endl
+              << random4->value << std::endl
+              << random5->value << std::endl;
 }
 
 std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
@@ -172,7 +186,9 @@ std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
 std::shared_ptr<Tree> Tree::crossover(const std::shared_ptr<Tree> &parent1,
                                       const std::shared_ptr<Tree> &parent2)
 {
-    std::shared_ptr<Tree> result = parent1;
+    std::shared_ptr<Tree> result = parent1->duplicate();
+
+    return result;
 }
 
 int32_t Tree::calculate(void) const
@@ -185,9 +201,14 @@ int32_t Tree::calculate(const std::vector<int32_t> &numbers) const
     return calculate(m_root, numbers);
 }
 
-int32_t Tree::calculateDepth(void) const
+uint32_t Tree::calculateDepth(void) const
 {
     return calculateDepth(m_root, 0);
+}
+
+uint32_t Tree::calculateSize(void) const
+{
+    return calculateSize(m_root);
 }
 
 void Tree::reduce(const std::vector<int32_t> &numbers)
@@ -337,6 +358,49 @@ Node *Tree::copyNode(Node *node)
     return result;
 }
 
+Node *Tree::getRandomNode(void)
+{
+    uint32_t size = calculateSize();
+    if(size == 0)
+        return nullptr;
+
+    Random random;
+    uint32_t rand = random.nextInt(size);
+
+    if(rand == 0)
+        return m_root;
+
+    std::vector<Node*> buffer;
+    std::vector<Node*> tmp;
+    buffer.push_back(m_root);
+
+    uint32_t i = 0;
+    while(!buffer.empty())
+    {
+        for(auto it = buffer.begin(); it != buffer.end(); it++)
+        {
+            if((*it)->left)
+            {
+                if(++i == rand)
+                    return (*it)->left;
+                tmp.push_back((*it)->left);
+            }
+
+            if((*it)->right)
+            {
+                if(++i == rand)
+                    return (*it)->right;
+                tmp.push_back((*it)->right);
+            }
+        }
+
+        buffer.swap(tmp);
+        tmp.clear();
+    }
+
+    return nullptr;
+}
+
 int32_t Tree::calculate(Node *node) const
 {
     if(node->type == NodeType::NodeTypeOperand)
@@ -380,7 +444,7 @@ int32_t Tree::doCalculation(Operator operation, int32_t operand1, int32_t operan
     return 0;
 }
 
-int32_t Tree::calculateDepth(Node *node, int32_t depth) const
+uint32_t Tree::calculateDepth(Node *node, int32_t depth) const
 {
     if(!node)
         return depth;
@@ -389,6 +453,17 @@ int32_t Tree::calculateDepth(Node *node, int32_t depth) const
     int32_t depthRight = calculateDepth(node->right, depth + 1);
 
     return depthLeft > depthRight ? depthLeft : depthRight;
+}
+
+uint32_t Tree::calculateSize(Node *node) const
+{
+    if(!node)
+        return 0;
+
+    uint32_t left = calculateSize(node->left);
+    uint32_t right = calculateSize(node->right);
+
+    return left + right + 1;
 }
 
 Node *Tree::reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer)
