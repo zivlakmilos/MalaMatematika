@@ -50,19 +50,11 @@ void Tree::test(void)
     std::cout << tree << std::endl;
     std::cout << *tree2 << std::endl;
 
-    std::shared_ptr<Tree> tmp = Tree::generateRandomTree(6);
+    std::shared_ptr<Tree> tmp1 = tree.duplicate();
+    std::shared_ptr<Tree> tmp2 = Tree::generateRandomTree(6);
 
-    Node *random1 = tmp->getRandomNode();
-    Node *random2 = tmp->getRandomNode();
-    Node *random3 = tmp->getRandomNode();
-    Node *random4 = tmp->getRandomNode();
-    Node *random5 = tmp->getRandomNode();
-
-    std::cout << random1->value << std::endl
-              << random2->value << std::endl
-              << random3->value << std::endl
-              << random4->value << std::endl
-              << random5->value << std::endl;
+    std::shared_ptr<Tree> child = Tree::crossover(tmp1, tmp2);
+    std::cout << *child << std::endl;;
 }
 
 std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
@@ -114,32 +106,6 @@ std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
         nodes.push_back(node);
     }
 
-    for(auto it = nodes.begin(); it != nodes.end(); it++)
-    {
-        if(it->type == NodeTypeOperator)
-        {
-            switch(it->value)
-            {
-                case OperatorPlus:
-                    std::cout << '+';
-                    break;
-                case OperatorMinus:
-                    std::cout << '-';
-                    break;
-                case OperatorTimes:
-                    std::cout << '*';
-                    break;
-                case OperatorOver:
-                    std::cout << '/';
-                    break;
-            }
-        } else
-        {
-            std::cout << it->value;
-        }
-    }
-    std::cout << std::endl;
-
     auto it = nodes.rbegin();
 
     std::shared_ptr<Tree> tree = std::make_shared<Tree>();
@@ -187,6 +153,29 @@ std::shared_ptr<Tree> Tree::crossover(const std::shared_ptr<Tree> &parent1,
                                       const std::shared_ptr<Tree> &parent2)
 {
     std::shared_ptr<Tree> result = parent1->duplicate();
+
+    Node *node1;
+    Node *node2;
+
+    do
+    {
+        node1 = result->getRandomNode();
+        node2 = parent2->getRandomNode();
+    } while((result->calculateSize(node1) + 1) / 2 > (result->calculateSize(node2) + 1) / 2);
+
+    Node *parent = node1->parent;
+    if(parent)
+    {
+        ChildPosition position = parent->left == node1 ? ChildPositionLeft : ChildPositionRight;
+        result->deleteNode(node1);
+        result->addNode(node2, position, parent);
+    } else
+    {
+        result->deleteNode(node1);
+        result->createRoot(*node2);
+        result->addNode(node2->left, ChildPositionLeft, result->m_root);
+        result->addNode(node2->right, ChildPositionRight, result->m_root);
+    }
 
     return result;
 }
@@ -275,6 +264,31 @@ bool Tree::addNode(const Node &node, ChildPosition position, Node *parent)
     } else
     {
         delete tmp;
+        return false;
+    }
+
+    return true;
+}
+
+bool Tree::addNode(Node *node, ChildPosition position, Node *parent)
+{
+    if(!parent)
+        return false;
+
+    Node *tmp = copyNode(node);
+    node->parent = nullptr;
+
+    if(position == ChildPositionLeft && !parent->left)
+    {
+        parent->left = tmp;
+        tmp->parent = parent;
+    } else if(position == ChildPositionRight && !parent->right)
+    {
+        parent->right = tmp;
+        tmp->parent = parent;
+    } else
+    {
+        deleteNode(node);
         return false;
     }
 

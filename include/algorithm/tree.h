@@ -73,6 +73,7 @@ public:
 private:
     void createRoot(const Node &node);
     bool addNode(const Node &node, ChildPosition position, Node *parent);
+    bool addNode(Node *node, ChildPosition position, Node *parent);
     void deleteNode(Node *node);
     bool swapNodes(Node *node1, Node *node2);
     Node *copyNode(Node *node);
