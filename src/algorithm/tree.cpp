@@ -53,10 +53,14 @@ void Tree::test(void)
     std::shared_ptr<Tree> tmp1 = tree.duplicate();
     std::shared_ptr<Tree> tmp2 = Tree::generateRandomTree(6);
 
-    std::shared_ptr<Tree> child = Tree::crossover(tmp1, tmp2);
-    child->reduceDuplicated();
+    //std::shared_ptr<Tree> child = Tree::crossover(tmp1, tmp2);
+    //child->reduceDuplicated();
     //std::cout << *tmp2 << std::endl;
-    std::cout << *child << std::endl;;
+    //std::cout << *child << std::endl;;
+
+    std::cout << *tmp2 << std::endl;
+    tmp2->mutation();
+    std::cout << *tmp2 << std::endl;
 }
 
 std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
@@ -267,6 +271,58 @@ std::shared_ptr<Tree> Tree::duplicate(void)
     return result;
 }
 
+void Tree::mutation(void)
+{
+    Random random;
+
+    if(random.nextFloat() > 0.5f)
+    {
+        Node *node1;
+        Node *node2;
+
+        do
+        {
+            node1 = getRandomNode();
+            node2 = getRandomNode();
+        } while(isAncestor(node1, node2));
+
+        swapNodes(node1, node2);
+    } else
+    {
+        Node *node;
+        do
+        {
+            node = getRandomNode();
+        } while(node->type != NodeTypeOperand);
+
+        std::vector<Node*> duplicateNodes;
+        std::vector<int32_t> ussendNumbers;
+        std::vector<int32_t> freeNumbers;
+        findDuplicatedNodes(m_root, duplicateNodes, ussendNumbers);
+
+        for(int i = 0; i < 6; i++)
+        {
+            bool duplicate = false;
+            for(auto it = ussendNumbers.begin(); it != ussendNumbers.end(); it++)
+            {
+                if(i == *it)
+                {
+                    duplicate = true;
+                    break;
+                }
+            }
+            if(!duplicate)
+                freeNumbers.push_back(i);
+        }
+
+        if(!freeNumbers.empty())
+        {
+            int32_t rand = random.nextInt(freeNumbers.size());
+            node->value = freeNumbers[rand];
+        }
+    }
+}
+
 void Tree::createRoot(const Node &node)
 {
     if(m_root)
@@ -454,6 +510,27 @@ Node *Tree::getRandomNode(void)
     }
 
     return nullptr;
+}
+
+bool Tree::isAncestor(Node *node1, Node *node2)
+{
+    Node *tmp = node1;
+    while(tmp)
+    {
+        if(tmp == node2)
+            return true;
+        tmp = tmp->parent;
+    }
+
+    tmp = node2;
+    while(tmp)
+    {
+        if(tmp == node1)
+            return true;
+        tmp = tmp->parent;
+    }
+
+    return false;
 }
 
 int32_t Tree::calculate(Node *node) const

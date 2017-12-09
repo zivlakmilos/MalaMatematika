@@ -69,6 +69,8 @@ public:
 
     std::shared_ptr<Tree> duplicate(void);
 
+    void mutation(void);
+
     friend std::ostream &operator<<(std::ostream &os, const Tree &tree);
 
 private:
@@ -79,6 +81,7 @@ private:
     bool swapNodes(Node *node1, Node *node2);
     Node *copyNode(Node *node);
     Node *getRandomNode(void);
+    bool isAncestor(Node *node1, Node *node2);
 
     int32_t calculate(Node *node) const;
     int32_t calculate(Node *node, const std::vector<int32_t> &numbers) const;
