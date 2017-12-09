@@ -47,13 +47,15 @@ void Tree::test(void)
     std::shared_ptr<Tree> tree2 = tree.duplicate();
     tree2->reduce(numbers);
 
-    std::cout << tree << std::endl;
-    std::cout << *tree2 << std::endl;
+    //std::cout << tree << std::endl;
+    //std::cout << *tree2 << std::endl;
 
     std::shared_ptr<Tree> tmp1 = tree.duplicate();
     std::shared_ptr<Tree> tmp2 = Tree::generateRandomTree(6);
 
     std::shared_ptr<Tree> child = Tree::crossover(tmp1, tmp2);
+    child->reduceDuplicated();
+    //std::cout << *tmp2 << std::endl;
     std::cout << *child << std::endl;;
 }
 
@@ -161,7 +163,7 @@ std::shared_ptr<Tree> Tree::crossover(const std::shared_ptr<Tree> &parent1,
     {
         node1 = result->getRandomNode();
         node2 = parent2->getRandomNode();
-    } while((result->calculateSize(node1) + 1) / 2 > (result->calculateSize(node2) + 1) / 2);
+    } while((result->calculateSize(node1) + 1) / 2 < (result->calculateSize(node2) + 1) / 2);
 
     Node *parent = node1->parent;
     if(parent)
@@ -210,6 +212,42 @@ void Tree::reduce(const std::vector<int32_t> &numbers)
         newNode.type = node->type;
         newNode.value = node->value;
         createRoot(newNode);
+    }
+}
+
+void Tree::reduceDuplicated(void)
+{
+    Random random;
+    std::vector<Node*> duplicateNodes;
+    std::vector<int32_t> ussedIntegers;
+    std::vector<int32_t> freeIntegers;
+
+    findDuplicatedNodes(m_root, duplicateNodes, ussedIntegers);
+
+    if(duplicateNodes.empty())
+        return;
+
+    for(int i = 0; i < 6; i++)
+    {
+        bool duplicated = false;
+        for(auto it = ussedIntegers.begin(); it != ussedIntegers.end(); it++)
+        {
+            if(i == *it)
+            {
+                duplicated = true;
+                break;
+            }
+        }
+
+        if(!duplicated)
+            freeIntegers.push_back(i);
+    }
+
+    for(auto it = duplicateNodes.begin(); it != duplicateNodes.end(); it++)
+    {
+        int32_t rand = random.nextInt(freeIntegers.size());
+        (*it)->value = freeIntegers[rand];
+        freeIntegers.erase(freeIntegers.begin() + rand);
     }
 }
 
@@ -272,7 +310,7 @@ bool Tree::addNode(const Node &node, ChildPosition position, Node *parent)
 
 bool Tree::addNode(Node *node, ChildPosition position, Node *parent)
 {
-    if(!parent)
+    if(!parent || !node)
         return false;
 
     Node *tmp = copyNode(node);
@@ -306,6 +344,9 @@ void Tree::deleteNode(Node *node)
             node->parent->left = nullptr;
         if(node->parent->right == node)
             node->parent->right = nullptr;
+    } else
+    {
+        m_root = nullptr;
     }
     deleteNode(node->left);
     deleteNode(node->right);
@@ -524,6 +565,47 @@ Node *Tree::reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<
     }
 
     return nullptr;
+}
+
+void Tree::findDuplicatedNodes(Node *node, std::vector<Node*> &nodeBuffer, std::vector<int32_t> &intBuffer)
+{
+    if(!node)
+        return;
+
+    std::vector<Node*> currentBuffer;
+    std::vector<Node*> nextBuffer;
+    currentBuffer.push_back(node);
+
+    while(!currentBuffer.empty())
+    {
+        for(auto it = currentBuffer.begin(); it != currentBuffer.end(); it++)
+        {
+            if((*it)->type == NodeTypeOperator)
+            {
+                nextBuffer.push_back((*it)->left);
+                nextBuffer.push_back((*it)->right);
+            } else
+            {
+                bool duplicated = false;
+                for(auto it2 = intBuffer.begin(); it2 != intBuffer.end(); it2++)
+                {
+                    if((*it)->value == *it2)
+                    {
+                        duplicated = true;
+                        nodeBuffer.push_back(*it);
+                        break;
+                    }
+                }
+                if(!duplicated)
+                {
+                    intBuffer.push_back((*it)->value);
+                }
+            }
+        }
+
+        currentBuffer.swap(nextBuffer);
+        nextBuffer.clear();
+    }
 }
 
 std::ostream &operator<<(std::ostream &os, const Tree& tree)
