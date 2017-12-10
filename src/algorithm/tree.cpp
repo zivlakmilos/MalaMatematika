@@ -73,7 +73,7 @@ std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
     std::vector<Node> nodes;
 
     Node node;
-    int operandCount2;
+    int operandCount2 = 0;
     while(operandCount > 0)
     {
         if(operandCount2 >= 2)

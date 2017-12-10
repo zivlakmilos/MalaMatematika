@@ -3,7 +3,7 @@
 #include "ui/mainwindow.h"
 
 #include <iostream>
-#include "algorithm/tree.h"
+#include "algorithm/ai.h"
 
 int main(void)
 {
@@ -15,7 +15,13 @@ int main(void)
     std::cout << tree->calculate() << std::endl;
     std::cout << tree->calculate(brojevi) << std::endl;
     */
-    Tree::test();
+    //Tree::test();
+
+    int32_t result = 100;
+    std::vector<int32_t> numbers { 1, 2, 3, 4, 24, 50 };
+
+    AI ai(result, numbers);
+    ai.findExpression();
 
     return 0;
 }

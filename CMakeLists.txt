@@ -19,21 +19,12 @@ set(SOURCES
     src/core/exceptionzagrada.cpp
     src/core/random.cpp
     src/algorithm/tree.cpp
-    src/matematika.cpp
-    src/dna.cpp
-    src/ai.cpp
-    src/aithread.cpp
-
-    src/ui/wigra.cpp
-    src/ui/mainwindow.cpp
+    src/algorithm/ai.cpp
 
     src/main.cpp
 )
 
 set(HEADERS
-    include/aithread.h
-    include/ui/wigra.h
-    include/ui/mainwindow.h
 )
 
 set(UI
