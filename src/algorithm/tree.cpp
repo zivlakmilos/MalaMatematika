@@ -66,9 +66,7 @@ void Tree::test(void)
 std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
 {
     Random random;
-    std::vector<uint8_t> operandi;
-    for(int i = 0; i < 6; i++)
-        operandi.push_back(i);
+    std::vector<uint8_t> operands = { 0, 1, 2, 3, 4, 5 };
 
     std::vector<Node> nodes;
 
@@ -85,19 +83,19 @@ std::shared_ptr<Tree> Tree::generateRandomTree(int operandCount)
                 operandCount2--;
             } else
             {
-                uint8_t index = random.nextInt(operandi.size());
+                uint8_t index = random.nextInt(operands.size());
                 node.type = NodeTypeOperand;
-                node.value = operandi[index];
-                operandi.erase(operandi.begin() + index);
+                node.value = operands[index];
+                operands.erase(operands.begin() + index);
                 operandCount2++;
                 operandCount--;
             }
         } else
         {
-            uint8_t index = random.nextInt(operandi.size());
+            uint8_t index = random.nextInt(operands.size());
             node.type = NodeTypeOperand;
-            node.value = operandi[index];
-            operandi.erase(operandi.begin() + index);
+            node.value = operands[index];
+            operands.erase(operands.begin() + index);
             operandCount2++;
             operandCount--;
         }
@@ -637,7 +635,9 @@ Node *Tree::reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<
     {
         if(it->value == result)
         {
-            return it->node;
+            Node *node = it->node;
+            buffer.erase(it);
+            return node;
         }
     }
 

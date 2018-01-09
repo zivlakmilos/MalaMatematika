@@ -17,10 +17,10 @@ int main(void)
     */
     //Tree::test();
 
-    int32_t result = 100;
+    int32_t target = 100;
     std::vector<int32_t> numbers { 1, 2, 3, 4, 24, 50 };
 
-    AI ai(result, numbers);
+    AI ai(target, numbers);
     ai.findExpression();
 
     return 0;

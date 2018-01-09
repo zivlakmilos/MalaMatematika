@@ -14,7 +14,7 @@
 class AI
 {
 public:
-    AI(int32_t result, const std::vector<int32_t> &numbers);
+    AI(int32_t targetNumber, const std::vector<int32_t> &numbers);
     ~AI(void);
 
     std::shared_ptr<Tree> findExpression(void);
@@ -25,7 +25,7 @@ private:
     void reproduction(void);
     void mutation(void);
 
-    int32_t m_result;
+    int32_t m_targetNumber;
     std::vector<int32_t> m_numbers;
 
     std::shared_ptr<Tree> m_bestExpression;
