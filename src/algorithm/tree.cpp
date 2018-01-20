@@ -207,14 +207,7 @@ uint32_t Tree::calculateSize(void) const
 void Tree::reduce(const std::vector<int32_t> &numbers)
 {
     std::vector<NodeValue> buffer;
-    Node *node = reduce(m_root, numbers, buffer);
-    if(node)
-    {
-        Node newNode;
-        newNode.type = node->type;
-        newNode.value = node->value;
-        createRoot(newNode);
-    }
+    reduce(m_root, numbers, buffer);
 }
 
 void Tree::reduceDuplicated(void)
@@ -596,10 +589,10 @@ uint32_t Tree::calculateSize(Node *node) const
     return left + right + 1;
 }
 
-Node *Tree::reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer)
+void Tree::reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer)
 {
     if(!node)
-        return nullptr;
+        return;
 
     if(node->type == NodeTypeOperand)
     {
@@ -607,41 +600,41 @@ Node *Tree::reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<
         nodeValue.node = node;
         nodeValue.value = numbers[node->value];
         buffer.push_back(nodeValue);
-        return nullptr;
+        return;
     }
 
-    Node *left = reduce(node->left, numbers, buffer);
-    if(left)
-    {
-        Node newNode;
-        newNode.type = left->type;
-        newNode.value = left->value;
-        deleteNode(node->left);
-        addNode(newNode, ChildPositionLeft, node);
-    }
+    std::vector<NodeValue> bufferLeft;
+    std::vector<NodeValue> bufferRight;
 
-    Node *right = reduce(node->right, numbers, buffer);
-    if(right)
-    {
-        Node newNode;
-        newNode.type = right->type;
-        newNode.value = right->value;
-        deleteNode(node->right);
-        addNode(newNode, ChildPositionRight, node);
-    }
+    reduce(node->left, numbers, bufferLeft);
+    reduce(node->right, numbers, bufferRight);
 
-    int32_t result = calculate(node, numbers);
+    buffer.insert(buffer.end(), bufferLeft.begin(), bufferLeft.end());
+    buffer.insert(buffer.end(), bufferRight.begin(), bufferRight.end());
+
+    int32_t result = calculate(node);
+
     for(auto it = buffer.begin(); it != buffer.end(); it++)
     {
         if(it->value == result)
         {
-            Node *node = it->node;
-            buffer.erase(it);
-            return node;
+            Node newNode;
+            newNode.type = it->node->type;
+            newNode.value = it->node->value;
+            Node *parent = node->parent;
+            if(parent)
+            {
+                ChildPosition childPosition = node == parent->left ? ChildPositionLeft : ChildPositionRight;
+                deleteNode(node);
+                addNode(newNode, childPosition, parent);
+            } else
+            {
+                createRoot(newNode);
+            }
+            buffer.clear();
+            return;
         }
     }
-
-    return nullptr;
 }
 
 void Tree::findDuplicatedNodes(Node *node, std::vector<Node*> &nodeBuffer, std::vector<int32_t> &intBuffer)

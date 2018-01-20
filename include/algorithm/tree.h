@@ -89,7 +89,7 @@ private:
     uint32_t calculateDepth(Node *node, int32_t depth) const;
     uint32_t calculateSize(Node *node) const;
 
-    Node *reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer);
+    void reduce(Node *node, const std::vector<int32_t> &numbers, std::vector<NodeValue> &buffer);
     void findDuplicatedNodes(Node *node, std::vector<Node*> &nodeBuffer, std::vector<int32_t> &intBuffer);
 
     Node *m_root;
